@@ -1,0 +1,32 @@
+[[spring-core]]
+= Core Technologies
+
+이 참조 문서의 이 부분은 스프링 프레임워크의 핵심 기술을 모두 다룹니다.
+
+가장 중요한 것 중 하나는 Spring Framework의 제어의 역전 (IoC) 컨테이너입니다.
+Spring Framework의 IoC 컨테이너에 대한 철저한 다루임은 Spring의 관점 지향 프로그래밍 (AOP) 기술에 대한 포괄적인 커버리지가 바로 뒤를 따릅니다.
+Spring Framework는 자체 AOP Framework를 갖추고 있으며 이는 개념적으로 이해하기 쉽고 Java 엔터프라이즈 프로그래밍에서 AOP 요구 사항의 80% 스위트 스팟을 성공적으로 해결합니다.
+
+Spring의 AspectJ와의 통합에 대한 커버리지도 제공됩니다 (현재 Java 엔터프라이즈 공간에서 가장 많은 기능을 제공하고 있으며 확실히 가장 성숙한 AOP 구현입니다).
+AOT(Ahead-Of-Time) 처리는 GraalVM을 사용하여 애플리케이션을 미리 최적화하는 데 사용할 수 있습니다. 일반적으로 네이티브 이미지 배포에 사용됩니다.
+
+---
+
+This part of the reference documentation covers all the technologies that are
+absolutely integral to the Spring Framework.
+
+Foremost amongst these is the Spring Framework's Inversion of Control (IoC) container.
+A thorough treatment of the Spring Framework's IoC container is closely followed by
+comprehensive coverage of Spring's Aspect-Oriented Programming (AOP) technologies.
+The Spring Framework has its own AOP framework, which is conceptually easy to
+understand and which successfully addresses the 80% sweet spot of AOP requirements
+in Java enterprise programming.
+
+Coverage of Spring's integration with AspectJ (currently the richest -- in terms of
+features -- and certainly most mature AOP implementation in the Java enterprise space)
+is also provided.
+
+AOT processing can be used to optimize your application ahead-of-time. It is typically
+used for native image deployment using GraalVM.
+  
+
