@@ -1,0 +1,63 @@
+[[beans-introduction]]
+= Spring IoC 컨테이너 및 빈 소개
+
+이 장에서는 Inversion of Control (IoC) 원칙의 Spring Framework 구현을 다룹니다. IoC는 종속성 주입 (DI)으로도 알려져 있습니다.
+이는 객체가 생성자 인수, 팩토리 메서드의 인수 또는 객체 인스턴스가 생성되거나 팩토리 메서드에서 반환된 후 설정되는 속성을 통해 종속성 (즉, 작업하는 다른 객체)을 정의하는 프로세스입니다.
+그런 다음 컨테이너는 빈을 생성할 때 이러한 종속성을 주입합니다.
+이 프로세스는 빈 자체가 직접 클래스의 직접 생성 또는 Service Locator 패턴과 같은 메커니즘을 사용하여 종속성의 인스턴스화 또는 위치를 제어하는 것과 근본적으로 반대되는 것입니다 (따라서 Inversion of Control이라는 이름이 붙은 것입니다). +
+
+`org.springframework.beans` 및 `org.springframework.context` 패키지는 Spring Framework의 IoC 컨테이너의 기초입니다. `BeanFactory` 인터페이스는 모든 종류의 객체를 관리할 수 있는 고급 구성 메커니즘을 제공합니다.
+`ApplicationContext`는 `BeanFactory`의 하위 인터페이스입니다. 이것은 다음을 추가합니다.
+
+* Spring의 AOP 기능과의 더 쉬운 통합
+* 메시지 리소스 처리 (국제화에 사용)
+* 이벤트 게시
+* 웹 응용 프로그램에서 사용하는 `WebApplicationContext`와 같은 응용 프로그램 레이어별 특정 컨텍스트.
+
+간단히 말해, `BeanFactory`는 구성 프레임워크와 기본 기능을 제공하며 `ApplicationContext`는 엔터프라이즈 특화 기능을 추가합니다. `ApplicationContext`는 `BeanFactory`의 완전한 상위 집합이며, 이 장에서는 Spring의 IoC 컨테이너에 대한 설명에 독점적으로 사용됩니다. `BeanFactory` 대신 `ApplicationContext`를 사용하는 자세한 내용은 `BeanFactory` API를 다루는 섹션을 참조하십시오.
+
+Spring에서 Spring IoC 컨테이너에 의해 관리되며 애플리케이션의 중요한 구성 요소를 형성하는 객체를 빈이라고 합니다. 빈은 Spring IoC 컨테이너에서 인스턴스화, 조립 및 관리되는 객체입니다. 그렇지 않으면 빈은 단순히 애플리케이션 내의 많은 객체 중 하나입니다. 빈과 그 사이의 종속성은 컨테이너에서 사용하는 구성 메타데이터에 반영됩니다.
+
+
+---
+= Introduction to the Spring IoC Container and Beans
+
+This chapter covers the Spring Framework implementation of the Inversion of Control
+(IoC) principle. IoC is also known as dependency injection (DI). It is a process whereby
+objects define their dependencies (that is, the other objects they work with) only through
+constructor arguments, arguments to a factory method, or properties that are set on the
+object instance after it is constructed or returned from a factory method. The container
+then injects those dependencies when it creates the bean. This process is fundamentally
+the inverse (hence the name, Inversion of Control) of the bean itself
+controlling the instantiation or location of its dependencies by using direct
+construction of classes or a mechanism such as the Service Locator pattern.
+
+The `org.springframework.beans` and `org.springframework.context` packages are the basis
+for Spring Framework's IoC container. The
+{api-spring-framework}/beans/factory/BeanFactory.html[`BeanFactory`]
+interface provides an advanced configuration mechanism capable of managing any type of
+object.
+{api-spring-framework}/context/ApplicationContext.html[`ApplicationContext`]
+is a sub-interface of `BeanFactory`. It adds:
+
+* Easier integration with Spring's AOP features
+* Message resource handling (for use in internationalization)
+* Event publication
+* Application-layer specific contexts such as the `WebApplicationContext`
+for use in web applications.
+
+In short, the `BeanFactory` provides the configuration framework and basic functionality,
+and the `ApplicationContext` adds more enterprise-specific functionality. The
+`ApplicationContext` is a complete superset of the `BeanFactory` and is used exclusively
+in this chapter in descriptions of Spring's IoC container. For more information on using
+the `BeanFactory` instead of the `ApplicationContext,` see the section covering the
+xref:core/beans/beanfactory.adoc[`BeanFactory` API].
+
+In Spring, the objects that form the backbone of your application and that are managed
+by the Spring IoC container are called beans. A bean is an object that is
+instantiated, assembled, and managed by a Spring IoC container. Otherwise, a
+bean is simply one of many objects in your application. Beans, and the dependencies
+among them, are reflected in the configuration metadata used by a container.
+
+
+
