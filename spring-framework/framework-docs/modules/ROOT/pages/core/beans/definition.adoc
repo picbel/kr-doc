@@ -45,7 +45,9 @@ Spring IoC 컨테이너는 하나 이상의 빈을 관리합니다. 이러한 �
 | xref:core/beans/factory-nature.adoc#beans-factory-lifecycle-disposablebean[소멸 콜백]
 |===
 
-빈 정의 메타데이터뿐만 아니라 컨테이너 외부(사용자에 의해)에서 생성된 기존 객체의 등록도 `ApplicationContext` 구현에서 허용됩니다. 이는 `getBeanFactory()` 메서드를 통해 `DefaultListableBeanFactory` 구현을 반환하는 `ApplicationContext`의 `BeanFactory`에 액세스하여 수행됩니다. `DefaultListableBeanFactory`는 `registerSingleton(..)` 및 `registerBeanDefinition(..)` 메서드를 통해 이 등록을 지원합니다. 그러나 일반적인 응용 프로그램은 보통 정규 빈 정의 메타데이터를 통해 정의된 빈들과만 작동합니다.
+빈 정의 메타데이터뿐만 아니라 컨테이너 외부(사용자에 의해)에서 생성된 기존 객체의 등록도 `ApplicationContext` 구현에서 허용됩니다. 
+이는 `getBeanFactory()` 메서드를 통해 `DefaultListableBeanFactory` 구현을 반환하는 `ApplicationContext`의 `BeanFactory`에 액세스하여 수행됩니다. 
+`DefaultListableBeanFactory`는 `registerSingleton(..)` 및 `registerBeanDefinition(..)` 메서드를 통해 이 등록을 지원합니다. 그러나 일반적인 응용 프로그램은 보통 정규 빈 정의 메타데이터를 통해 정의된 빈들과만 작동합니다.
 
 [NOTE]
 ====
@@ -57,7 +59,10 @@ Spring IoC 컨테이너는 하나 이상의 빈을 관리합니다. 이러한 �
 
 모든 빈은 하나 이상의 식별자를 가지고 있어야 합니다. 이러한 식별자들은 빈을 호스팅하는 컨테이너 내에서 고유해야 합니다. 빈은 보통 하나의 식별자만 가집니다. 그러나 하나 이상의 식별자가 필요한 경우 추가 식별자는 별칭으로 간주할 수 있습니다.
 
-XML 기반의 구성 메타데이터에서 빈 식별자를 지정하려면 `id` 속성, `name` 속성 또는 둘 다를 사용합니다. `id` 속성은 하나의 `id`를 지정하도록 허용합니다. 일반적으로 이러한 이름은 알파벳과 숫자로 이루어져 있습니다('myBean', 'someService' 등), 하지만 특수 문자도 포함할 수 있습니다. 빈에 대한 다른 별칭을 도입하려면 `name` 속성에서 쉼표(','), 세미콜론(';'), 공백으로 구분하여 지정할 수도 있습니다. `id` 속성은 `xsd:string` 타입으로 정의되어 있지만 빈 `id`의 고유성은 컨테이너에 의해 강제되며 XML 파서에 의해 강제되지 않습니다.
+XML 기반의 구성 메타데이터에서 빈 식별자를 지정하려면 `id` 속성, `name` 속성 또는 둘 다를 사용합니다. `id` 속성은 하나의 `id`를 지정하도록 허용합니다. 
+일반적으로 이러한 이름은 알파벳과 숫자로 이루어져 있습니다('myBean', 'someService' 등), 하지만 특수 문자도 포함할 수 있습니다. 
+빈에 대한 다른 별칭을 도입하려면 `name` 속성에서 쉼표(','), 세미콜론(';'), 공백으로 구분하여 지정할 수도 있습니다. 
+`id` 속성은 `xsd:string` 타입으로 정의되어 있지만 빈 `id`의 고유성은 컨테이너에 의해 강제되며 XML 파서에 의해 강제되지 않습니다.
 
 빈에 대한 `name` 또는 `id`를 제공하는 것은 필수가 아닙니다. `name` 또는 `id`를 명시적으로 제공하지 않는 경우 컨테이너는 해당 빈에 대해 고유한 이름을 생성합니다. 그러나 그 빈을 이름으로 참조하려면 `ref` 요소나 서비스 로케이터 스타일 조회를 통해 이름을 제공해야 합니다.
 `name`을 제공하지 않는 이유는 xref:core/beans/dependencies/factory-properties-detailed.adoc#beans-inner-beans[내부 빈(inner beans)] 및 xref:core/beans/dependencies/factory-autowire.adoc[자동 와이어링(collaborators)]을 사용하는 것과 관련이 있습니다.
