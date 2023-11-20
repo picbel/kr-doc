@@ -1,0 +1,18 @@
+[[beans-dependencies]]
+= Dependencies
+
+일반적인 엔터프라이즈 애플리케이션은 단일 객체(또는 Spring 용어로 말하면 빈)로 이루어져 있지 않습니다. 
+심지어 가장 간단한 애플리케이션도 여러 개의 객체가 함께 작동하여 최종 사용자가 일관된 애플리케이션으로 보는 것을 실현합니다. 
+다음 섹션에서는 독립적으로 존재하는 여러 빈 정의에서 협업하여 목표를 달성하는 완전한 애플리케이션으로 나아가는 방법에 대해 설명합니다.
+---
+[[beans-dependencies]]
+= Dependencies
+:page-section-summary-toc: 1
+
+A typical enterprise application does not consist of a single object (or bean in the
+Spring parlance). Even the simplest application has a few objects that work together to
+present what the end-user sees as a coherent application. This next section explains how
+you go from defining a number of bean definitions that stand alone to a fully realized
+application where objects collaborate to achieve a goal.
+
+
