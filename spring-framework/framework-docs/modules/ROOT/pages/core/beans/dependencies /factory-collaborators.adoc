@@ -1,0 +1,558 @@
+[[beans-factory-collaborators]]
+= Dependency Injection
+
+의존성 주입(Dependency Injection, DI)은 객체가 자신과 작업하는 다른 객체(즉, 해당 객체와 협업하는 다른 객체)를 생성자 인수, 팩토리 메서드에 전달되는 인수 또는 객체 인스턴스가 생성된 후에 설정된 속성을 통해 정의하는 프로세스입니다. 
+그런 다음 컨테이너가 빈(Bean)을 생성할 때 이러한 의존성을 주입합니다. 
+이 프로세스는 빈 자체가 직접 클래스의 직접 생성 또는 서비스 위치 패턴(Service Locator 패턴)을 사용하여 의존성을 인스턴스화하거나 위치하는 것과 정반대로 동작하는 것입니다. 
+이것이 바로 "제어의 역전(Inversion of Control)"이라는 이름의 원리입니다.
+
+DI 원칙을 따를 때 코드가 더 깔끔하고, 객체가 필요한 의존성을 제공받을 때 결합도를 효과적으로 낮출 수 있습니다. 
+객체는 자신의 의존성을 조회하지 않으며, 의존성의 위치나 클래스에 대한 정보를 알지 않습니다. 
+결과적으로 클래스를 테스트하기가 더 쉬워지며, 특히 의존성이 인터페이스나 추상 기본 클래스에 있는 경우에는 유닛 테스트에서 스텁(Stub) 또는 목(Mock) 구현을 사용할 수 있습니다.
+
+DI에는 두 가지 주요 변형이 있습니다: 생성자 기반 의존성 주입(Constructor-based dependency injection)과 세터 기반 의존성 주입(Setter-based dependency injection)입니다.
+
+[[beans-constructor-injection]]
+== Constructor-based Dependency Injection
+
+
+생성자를 기반으로 한 의존성 주입(Constructor-based DI)은 컨테이너가 의존성을 나타내는 여러 인수를 사용하여 생성자를 호출하여 수행됩니다. 
+특정 인수를 사용하여 빈을 생성하기 위해 `static` 팩토리 메서드를 호출하는 것도 거의 동등하며, 이 토론은 생성자와 `static` 팩토리 메서드에 대한 인수를 유사하게 처리합니다. 
+다음 예제는 생성자 주입으로만 의존성 주입이 가능한 클래스를 보여줍니다:
+
+[tabs]
+======
+Java::
++
+[source,java,indent=0,subs="verbatim,quotes",role="primary"]
+----
+	public class SimpleMovieLister {
+
+		// the SimpleMovieLister has a dependency on a MovieFinder
+		private final MovieFinder movieFinder;
+
+		// a constructor so that the Spring container can inject a MovieFinder
+		public SimpleMovieLister(MovieFinder movieFinder) {
+			this.movieFinder = movieFinder;
+		}
+
+		// business logic that actually uses the injected MovieFinder is omitted...
+	}
+----
+
+Kotlin::
++
+[source,kotlin,indent=0,subs="verbatim,quotes",role="secondary"]
+----
+	// a constructor so that the Spring container can inject a MovieFinder
+	class SimpleMovieLister(private val movieFinder: MovieFinder) {
+		// business logic that actually uses the injected MovieFinder is omitted...
+	}
+----
+======
+
+이 클래스에는 특별한 점이 없다는 것을 주목하세요. 
+이 클래스는 컨테이너 특정 인터페이스, 기본 클래스 또는 주석에 의존하지 않는 POJO(Plain Old Java Object)입니다.
+
+[[beans-factory-ctor-arguments-resolution]]
+=== Constructor Argument Resolution
+
+생성자 인수 해결 매칭은 인수의 타입을 사용하여 발생합니다. 
+빈 정의의 생성자 인수에서 잠재적인 모호성이 없는 경우, 빈 정의의 생성자 인수가 정의된 순서대로 빈이 인스턴스화될 때 해당 생성자에 제공되는 순서입니다.
+다음 클래스를 고려해보세요:
+
+[tabs]
+======
+Java::
++
+[source,java,indent=0,subs="verbatim,quotes",role="primary",chomp="-packages"]
+----
+	package x.y;
+
+	public class ThingOne {
+
+		public ThingOne(ThingTwo thingTwo, ThingThree thingThree) {
+			// ...
+		}
+	}
+----
+
+Kotlin::
++
+[source,kotlin,indent=0,subs="verbatim,quotes",role="secondary",chomp="-packages"]
+----
+	package x.y
+
+	class ThingOne(thingTwo: ThingTwo, thingThree: ThingThree)
+----
+======
+
+`ThingTwo` 및 `ThingThree` 클래스가 상속 관계가 아닌 경우, 잠재적인 모호성이 없다고 가정합니다.
+따라서 다음 구성은 잘 작동하며 `<constructor-arg/>` 요소에서 생성자 인수의 인덱스나 유형을 명시적으로 지정할 필요가 없습니다.
+
+[source,xml,indent=0,subs="verbatim,quotes"]
+----
+	<beans>
+		<bean id="beanOne" class="x.y.ThingOne">
+			<constructor-arg ref="beanTwo"/>
+			<constructor-arg ref="beanThree"/>
+		</bean>
+
+		<bean id="beanTwo" class="x.y.ThingTwo"/>
+
+		<bean id="beanThree" class="x.y.ThingThree"/>
+	</beans>
+----
+
+다른 빈이 참조될 때는 해당 유형이 알려져 있고, 일치가 발생할 수 있습니다 (이전 예제와 같은 경우입니다). 
+그러나 `<value>true</value>`와 같이 간단한 유형이 사용되는 경우, 스프링은 값의 유형을 결정할 수 없으므로 도움 없이는 유형에 따라 일치시킬 수 없습니다. 
+다음 클래스를 고려해보세요:
+
+[tabs]
+======
+Java::
++
+[source,java,indent=0,subs="verbatim,quotes",role="primary",chomp="-packages"]
+----
+	package examples;
+
+	public class ExampleBean {
+
+		// Number of years to calculate the Ultimate Answer
+		private final int years;
+
+		// The Answer to Life, the Universe, and Everything
+		private final String ultimateAnswer;
+
+		public ExampleBean(int years, String ultimateAnswer) {
+			this.years = years;
+			this.ultimateAnswer = ultimateAnswer;
+		}
+	}
+----
+
+Kotlin::
++
+[source,kotlin,indent=0,subs="verbatim,quotes",role="secondary",chomp="-packages"]
+----
+	package examples
+
+	class ExampleBean(
+		private val years: Int, // Number of years to calculate the Ultimate Answer
+		private val ultimateAnswer: String // The Answer to Life, the Universe, and Everything
+	)
+----
+======
+
+.[[beans-factory-ctor-arguments-type]]Constructor argument type matching
+--
+앞서 언급한 시나리오에서, 컨테이너는 다음 예제와 같이 `type` 속성을 사용하여 생성자 인수의 유형을 명시적으로 지정하면 간단한 유형에 대해 유형 일치를 사용할 수 있습니다:
+
+[source,xml,indent=0,subs="verbatim,quotes"]
+----
+	<bean id="exampleBean" class="examples.ExampleBean">
+		<constructor-arg type="int" value="7500000"/>
+		<constructor-arg type="java.lang.String" value="42"/>
+	</bean>
+----
+--
+
+.[[beans-factory-ctor-arguments-index]]Constructor argument index
+--
+You can use the `index` attribute to specify explicitly the index of constructor arguments,
+as the following example shows:
+
+[source,xml,indent=0,subs="verbatim,quotes"]
+----
+	<bean id="exampleBean" class="examples.ExampleBean">
+		<constructor-arg index="0" value="7500000"/>
+		<constructor-arg index="1" value="42"/>
+	</bean>
+----
+
+In addition to resolving the ambiguity of multiple simple values, specifying an index
+resolves ambiguity where a constructor has two arguments of the same type.
+
+NOTE: The index is 0-based.
+--
+
+.[[beans-factory-ctor-arguments-name]]Constructor argument name
+--
+You can also use the constructor parameter name for value disambiguation, as the following
+example shows:
+
+[source,xml,indent=0,subs="verbatim,quotes"]
+----
+	<bean id="exampleBean" class="examples.ExampleBean">
+		<constructor-arg name="years" value="7500000"/>
+		<constructor-arg name="ultimateAnswer" value="42"/>
+	</bean>
+----
+
+Keep in mind that, to make this work out of the box, your code must be compiled with the
+debug flag enabled so that Spring can look up the parameter name from the constructor.
+If you cannot or do not want to compile your code with the debug flag, you can use the
+https://download.oracle.com/javase/8/docs/api/java/beans/ConstructorProperties.html[@ConstructorProperties]
+JDK annotation to explicitly name your constructor arguments. The sample class would
+then have to look as follows:
+
+[tabs]
+======
+Java::
++
+[source,java,indent=0,subs="verbatim,quotes",role="primary",chomp="-packages"]
+----
+	package examples;
+
+	public class ExampleBean {
+
+		// Fields omitted
+
+		@ConstructorProperties({"years", "ultimateAnswer"})
+		public ExampleBean(int years, String ultimateAnswer) {
+			this.years = years;
+			this.ultimateAnswer = ultimateAnswer;
+		}
+	}
+----
+
+Kotlin::
++
+[source,kotlin,indent=0,subs="verbatim,quotes",role="secondary",chomp="-packages"]
+----
+	package examples
+
+	class ExampleBean
+	@ConstructorProperties("years", "ultimateAnswer")
+	constructor(val years: Int, val ultimateAnswer: String)
+----
+======
+--
+
+
+[[beans-setter-injection]]
+== Setter-based Dependency Injection
+
+세터 기반 DI는 컨테이너가 빈을 인스턴스화하기 위해 매개변수 없는 생성자 또는 매개변수 없는 `static` 팩토리 메서드를 호출한 후 빈에 대해 세터 메서드를 호출하여 수행됩니다.
+
+다음 예제는 순수한 세터 주입을 사용하여 의존성 주입이 가능한 클래스를 보여줍니다. 이 클래스는 전통적인 자바입니다. 이 클래스는 컨테이너 특정 인터페이스, 기본 클래스 또는 주석에 의존하지 않는 POJO(Plain Old Java Object)입니다.
+
+[tabs]
+======
+Java::
++
+[source,java,indent=0,subs="verbatim,quotes",role="primary"]
+----
+	public class SimpleMovieLister {
+
+		// the SimpleMovieLister has a dependency on the MovieFinder
+		private MovieFinder movieFinder;
+
+		// a setter method so that the Spring container can inject a MovieFinder
+		public void setMovieFinder(MovieFinder movieFinder) {
+			this.movieFinder = movieFinder;
+		}
+
+		// business logic that actually uses the injected MovieFinder is omitted...
+	}
+----
+
+Kotlin::
++
+[source,kotlin,indent=0,subs="verbatim,quotes",role="secondary"]
+----
+class SimpleMovieLister {
+
+	// a late-initialized property so that the Spring container can inject a MovieFinder
+	lateinit var movieFinder: MovieFinder
+
+	// business logic that actually uses the injected MovieFinder is omitted...
+}
+----
+======
+
+
+`ApplicationContext`는 관리하는 빈들에 대해 생성자 기반과 세터 기반의 DI를 지원합니다. 또한 몇 가지 의존성이 이미 생성자 접근 방식을 통해 주입된 후에도 세터 기반 DI를 지원합니다.
+의존성은 `BeanDefinition` 형식으로 구성하며, 여기에는 `PropertyEditor` 인스턴스와 함께 속성을 한 형식에서 다른 형식으로 변환하는 데 사용됩니다. 
+그러나 대부분의 Spring 사용자들은 이러한 클래스들을 직접 (즉, 프로그래밍적으로) 다루지 않고 대신 XML `bean` 정의, `@Component`, `@Controller`와 같은 주석이 달린 컴포넌트 클래스 또는 Java 기반 `@Configuration` 클래스의 `@Bean` 메서드와 함께 작업합니다. 이러한 소스들은 내부적으로 `BeanDefinition`의 인스턴스로 변환되며 전체 Spring IoC 컨테이너 인스턴스를 로드하는 데 사용됩니다.
+
+[[beans-constructor-vs-setter-injection]]
+.Constructor-based or setter-based DI? (생성자 기반 or 세터 기반 DI?)
+****
+생성자 기반 및 세터 기반 의존성 주입을 혼합할 수 있기 때문에 원칙적으로 필수 의존성에는 생성자를 사용하고 선택적 의존성에는 세터 메서드 또는 구성 메서드를 사용하는 것이 좋은 지침입니다. 
+주의할 점은 `@Autowired` 주석을 세터 메서드에 사용하여 속성을 필수 의존성으로 만들 수 있지만, 인수의 프로그래밍적 유효성 검사와 함께 생성자 주입이 선호됩니다.
+
+스프링 팀은 일반적으로 생성자 주입을 권장하며, 이를 통해 애플리케이션 구성 요소를 변경할 수 없는(immutable) 객체로 구현하고 필수 의존성이 `null`이 아님을 보장할 수 있습니다. 
+또한 생성자 주입된 구성 요소는 항상 완전히 초기화된 상태로 클라이언트 코드에 반환됩니다. 또한, 생성자 인수의 수가 많은 것은 좋지 않은 코드의 징후로 간주되며, 이는 해당 클래스가 너무 많은 책임을 갖고 있을 가능성이 있으며 적절한 관심사 분리를 해결하기 위해 리팩토링되어야 함을 나타냅니다.
+
+세터 주입은 주로 클래스 내에서 합리적인 기본값을 할당할 수 있는 선택적 의존성에 사용해야 합니다. 
+그렇지 않으면 코드가 의존성을 사용하는 모든 곳에서 `null` 체크를 수행해야 합니다. 
+세터 주입의 장점 중 하나는 세터 메서드를 통해 나중에 클래스의 객체를 다시 구성하거나 다시 주입할 수 있게 만든다는 것입니다. 
+따라서 xref:integration/jmx.adoc[JMX MBeans]를 통한 관리는 세터 주입의 강력한 사용 사례입니다.
+
+특정 클래스에 가장 적합한 DI 스타일을 사용하세요. 
+때로는 소스 코드를 가지고 있지 않은 서드파티 클래스를 다룰 때 선택이 되어야 할 수도 있습니다. 
+예를 들어, 서드파티 클래스가 어떠한 세터 메서드도 노출하지 않는다면 생성자 주입이 유일한 사용 가능한 DI 형태일 수 있습니다.
+****
+
+
+[[beans-dependency-resolution]]
+== Dependency Resolution Process
+
+컨테이너는 다음과 같은 방식으로 빈의 의존성을 해결합니다:
+
+* `ApplicationContext`는 모든 빈을 설명하는 구성 메타데이터로 생성되고 초기화됩니다. 구성 메타데이터는 XML, Java 코드 또는 주석을 통해 지정할 수 있습니다.
+* 각 빈에 대해 해당 빈의 의존성이 속성, 생성자 인수 또는 정상적인 생성자 대신 사용할 경우 정적 팩토리 메서드의 인수 형식으로 표현됩니다. 이러한 의존성은 빈이 실제로 생성될 때 제공됩니다.
+* 각 속성 또는 생성자 인수는 설정할 값의 실제 정의 또는 컨테이너 내의 다른 빈에 대한 참조입니다.
+* 값으로 표시되는 각 속성 또는 생성자 인수는 지정된 형식에서 해당 속성 또는 생성자 인수의 실제 유형으로 변환됩니다. 기본적으로 Spring은 문자열 형식으로 제공된 값을 `int`, `long`, `String`, `boolean` 등의 모든 내장된 유형으로 변환할 수 있습니다.
+
+스프링 컨테이너는 컨테이너가 생성될 때 각 빈의 구성을 검증합니다. 
+그러나 빈 속성은 실제로 빈이 생성될 때까지 설정되지 않습니다. 
+싱글톤 범위(singleton-scoped) 및 미리 인스턴스화(pre-instantiated)로 설정된 빈은 컨테이너가 생성될 때 만들어집니다(기본값). 
+범위(scope)는 xref:core/beans/factory-scopes.adoc[빈 스코프]에서 정의됩니다. 
+그렇지 않으면 빈은 요청될 때만 생성됩니다. 빈의 생성은 빈의 의존성 및 의존성의 의존성(및 그 이후)이 생성되고 할당되면서 일련의 빈 그래프를 만들 수 있습니다.
+이러한 의존성 중 해결 불일치가 발생할 수 있으며, 이는 해당 빈이 처음으로 생성될 때 나타날 수 있습니다.
+
+.Circular dependencies
+****
+If you use predominantly constructor injection, it is possible to create an unresolvable
+circular dependency scenario.
+
+For example: Class A requires an instance of class B through constructor injection, and
+class B requires an instance of class A through constructor injection. If you configure
+beans for classes A and B to be injected into each other, the Spring IoC container
+detects this circular reference at runtime, and throws a
+`BeanCurrentlyInCreationException`.
+
+One possible solution is to edit the source code of some classes to be configured by
+setters rather than constructors. Alternatively, avoid constructor injection and use
+setter injection only. In other words, although it is not recommended, you can configure
+circular dependencies with setter injection.
+
+Unlike the typical case (with no circular dependencies), a circular dependency
+between bean A and bean B forces one of the beans to be injected into the other prior to
+being fully initialized itself (a classic chicken-and-egg scenario).
+****
+
+You can generally trust Spring to do the right thing. It detects configuration problems,
+such as references to non-existent beans and circular dependencies, at container
+load-time. Spring sets properties and resolves dependencies as late as possible, when
+the bean is actually created. This means that a Spring container that has loaded
+correctly can later generate an exception when you request an object if there is a
+problem creating that object or one of its dependencies -- for example, the bean throws an
+exception as a result of a missing or invalid property. This potentially delayed
+visibility of some configuration issues is why `ApplicationContext` implementations by
+default pre-instantiate singleton beans. At the cost of some upfront time and memory to
+create these beans before they are actually needed, you discover configuration issues
+when the `ApplicationContext` is created, not later. You can still override this default
+behavior so that singleton beans initialize lazily, rather than being eagerly
+pre-instantiated.
+
+If no circular dependencies exist, when one or more collaborating beans are being
+injected into a dependent bean, each collaborating bean is totally configured prior
+to being injected into the dependent bean. This means that, if bean A has a dependency on
+bean B, the Spring IoC container completely configures bean B prior to invoking the
+setter method on bean A. In other words, the bean is instantiated (if it is not a
+pre-instantiated singleton), its dependencies are set, and the relevant lifecycle
+methods (such as a xref:core/beans/factory-nature.adoc#beans-factory-lifecycle-initializingbean[configured init method]
+or the xref:core/beans/factory-nature.adoc#beans-factory-lifecycle-initializingbean[InitializingBean callback method])
+are invoked.
+
+
+[[beans-some-examples]]
+== Examples of Dependency Injection
+
+The following example uses XML-based configuration metadata for setter-based DI. A small
+part of a Spring XML configuration file specifies some bean definitions as follows:
+
+[source,xml,indent=0,subs="verbatim,quotes"]
+----
+	<bean id="exampleBean" class="examples.ExampleBean">
+		<!-- setter injection using the nested ref element -->
+		<property name="beanOne">
+			<ref bean="anotherExampleBean"/>
+		</property>
+
+		<!-- setter injection using the neater ref attribute -->
+		<property name="beanTwo" ref="yetAnotherBean"/>
+		<property name="integerProperty" value="1"/>
+	</bean>
+
+	<bean id="anotherExampleBean" class="examples.AnotherBean"/>
+	<bean id="yetAnotherBean" class="examples.YetAnotherBean"/>
+----
+
+The following example shows the corresponding `ExampleBean` class:
+
+[tabs]
+======
+Java::
++
+[source,java,indent=0,subs="verbatim,quotes",role="primary"]
+----
+	public class ExampleBean {
+
+		private AnotherBean beanOne;
+
+		private YetAnotherBean beanTwo;
+
+		private int i;
+
+		public void setBeanOne(AnotherBean beanOne) {
+			this.beanOne = beanOne;
+		}
+
+		public void setBeanTwo(YetAnotherBean beanTwo) {
+			this.beanTwo = beanTwo;
+		}
+
+		public void setIntegerProperty(int i) {
+			this.i = i;
+		}
+	}
+----
+
+Kotlin::
++
+[source,kotlin,indent=0,subs="verbatim,quotes",role="secondary"]
+----
+class ExampleBean {
+	lateinit var beanOne: AnotherBean
+	lateinit var beanTwo: YetAnotherBean
+	var i: Int = 0
+}
+----
+======
+
+In the preceding example, setters are declared to match against the properties specified
+in the XML file. The following example uses constructor-based DI:
+
+[source,xml,indent=0,subs="verbatim,quotes"]
+----
+	<bean id="exampleBean" class="examples.ExampleBean">
+		<!-- constructor injection using the nested ref element -->
+		<constructor-arg>
+			<ref bean="anotherExampleBean"/>
+		</constructor-arg>
+
+		<!-- constructor injection using the neater ref attribute -->
+		<constructor-arg ref="yetAnotherBean"/>
+
+		<constructor-arg type="int" value="1"/>
+	</bean>
+
+	<bean id="anotherExampleBean" class="examples.AnotherBean"/>
+	<bean id="yetAnotherBean" class="examples.YetAnotherBean"/>
+----
+
+The following example shows the corresponding `ExampleBean` class:
+
+[tabs]
+======
+Java::
++
+[source,java,indent=0,subs="verbatim,quotes",role="primary"]
+----
+	public class ExampleBean {
+
+		private AnotherBean beanOne;
+
+		private YetAnotherBean beanTwo;
+
+		private int i;
+
+		public ExampleBean(
+			AnotherBean anotherBean, YetAnotherBean yetAnotherBean, int i) {
+			this.beanOne = anotherBean;
+			this.beanTwo = yetAnotherBean;
+			this.i = i;
+		}
+	}
+----
+
+Kotlin::
++
+[source,kotlin,indent=0,subs="verbatim,quotes",role="secondary"]
+----
+class ExampleBean(
+		private val beanOne: AnotherBean,
+		private val beanTwo: YetAnotherBean,
+		private val i: Int)
+----
+======
+
+The constructor arguments specified in the bean definition are used as arguments to
+the constructor of the `ExampleBean`.
+
+Now consider a variant of this example, where, instead of using a constructor, Spring is
+told to call a `static` factory method to return an instance of the object:
+
+[source,xml,indent=0,subs="verbatim,quotes"]
+----
+	<bean id="exampleBean" class="examples.ExampleBean" factory-method="createInstance">
+		<constructor-arg ref="anotherExampleBean"/>
+		<constructor-arg ref="yetAnotherBean"/>
+		<constructor-arg value="1"/>
+	</bean>
+
+	<bean id="anotherExampleBean" class="examples.AnotherBean"/>
+	<bean id="yetAnotherBean" class="examples.YetAnotherBean"/>
+----
+
+The following example shows the corresponding `ExampleBean` class:
+
+[tabs]
+======
+Java::
++
+[source,java,indent=0,subs="verbatim,quotes",role="primary"]
+----
+	public class ExampleBean {
+
+		// a private constructor
+		private ExampleBean(...) {
+			...
+		}
+
+		// a static factory method; the arguments to this method can be
+		// considered the dependencies of the bean that is returned,
+		// regardless of how those arguments are actually used.
+		public static ExampleBean createInstance (
+			AnotherBean anotherBean, YetAnotherBean yetAnotherBean, int i) {
+
+			ExampleBean eb = new ExampleBean (...);
+			// some other operations...
+			return eb;
+		}
+	}
+----
+
+Kotlin::
++
+[source,kotlin,indent=0,subs="verbatim,quotes",role="secondary"]
+----
+	class ExampleBean private constructor() {
+		companion object {
+			// a static factory method; the arguments to this method can be
+			// considered the dependencies of the bean that is returned,
+			// regardless of how those arguments are actually used.
+			@JvmStatic
+			fun createInstance(anotherBean: AnotherBean, yetAnotherBean: YetAnotherBean, i: Int): ExampleBean {
+				val eb = ExampleBean (...)
+				// some other operations...
+				return eb
+			}
+		}
+	}
+----
+======
+
+Arguments to the `static` factory method are supplied by `<constructor-arg/>` elements,
+exactly the same as if a constructor had actually been used. The type of the class being
+returned by the factory method does not have to be of the same type as the class that
+contains the `static` factory method (although, in this example, it is). An instance
+(non-static) factory method can be used in an essentially identical fashion (aside
+from the use of the `factory-bean` attribute instead of the `class` attribute), so we
+do not discuss those details here.
+
+
