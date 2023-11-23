@@ -1,3 +1,6 @@
+
+
+---
 [[beans-factory-properties-detailed]]
 = Dependencies and Configuration in Detail
 
