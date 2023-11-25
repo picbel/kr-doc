@@ -1,25 +1,14 @@
-
-
-
----
 [[beans-factory-properties-detailed]]
 = Dependencies and Configuration in Detail
 
-As mentioned in the xref:core/beans/dependencies/factory-collaborators.adoc[previous section], you can define bean
-properties and constructor arguments as references to other managed beans (collaborators)
-or as values defined inline. Spring's XML-based configuration metadata supports
-sub-element types within its `<property/>` and `<constructor-arg/>` elements for this
-purpose.
-
+이전 섹션에서 언급한 대로, 빈의 속성과 생성자 인수를 다른 관리되는 빈(협력자)을 참조하거나 인라인으로 정의된 값으로 정의할 수 있습니다. Spring의 XML 기반 구성 메타데이터는 이 목적을 위해 `<property/>` 및 `<constructor-arg/>` 요소 내에서 하위 요소 유형을 지원합니다.
 
 [[beans-value-element]]
 == Straight Values (Primitives, Strings, and so on)
 
-The `value` attribute of the `<property/>` element specifies a property or constructor
-argument as a human-readable string representation. Spring's
-xref:core/validation/convert.adoc#core-convert-ConversionService-API[conversion service] is used to convert these
-values from a `String` to the actual type of the property or argument.
-The following example shows various values being set:
+`<property/>` 요소의 `value` 속성은 속성이나 생성자 인수를 인간이 읽을 수 있는 문자열 표현으로 지정합니다. 
+Spring의 변환 서비스를 사용하여 이러한 값을 `String`에서 속성 또는 인수의 실제 유형으로 변환합니다. 
+다음 예제는 다양한 값을 설정하는 방법을 보여줍니다:
 
 [source,xml,indent=0,subs="verbatim,quotes"]
 ----
@@ -32,7 +21,7 @@ The following example shows various values being set:
 	</bean>
 ----
 
-The following example uses the xref:core/beans/dependencies/factory-properties-detailed.adoc#beans-p-namespace[p-namespace] for even more succinct
+다음 예제에서는 더 간결한 XML 구성을 위해 xref:core/beans/dependencies/factory-properties-detailed.adoc#beans-p-namespace[p-namespace] 을 사용합니다.
 XML configuration:
 
 [source,xml,indent=0,subs="verbatim,quotes"]
@@ -53,11 +42,7 @@ XML configuration:
 	</beans>
 ----
 
-The preceding XML is more succinct. However, typos are discovered at runtime rather than
-design time, unless you use an IDE (such as https://www.jetbrains.com/idea/[IntelliJ
-IDEA] or the https://spring.io/tools[Spring Tools for Eclipse])
-that supports automatic property completion when you create bean definitions. Such IDE
-assistance is highly recommended.
+앞서 나온 XML은 더 간결하지만, 오타는 설계 시간이 아니라 런타임에서 발견됩니다. 단, 빈 정의를 생성할 때 자동 속성 완성을 지원하는 https://www.jetbrains.com/idea/[IntelliJ IDEA]나 https://spring.io/tools[Spring Tools for Eclipse]와 같은 IDE를 사용하는 경우에는 런타임이 아니라 설계 시간에도 오타를 발견할 수 있습니다. 이러한 IDE 지원은 강력히 권장됩니다.
 
 You can also configure a `java.util.Properties` instance, as follows:
 
@@ -76,17 +61,12 @@ You can also configure a `java.util.Properties` instance, as follows:
 	</bean>
 ----
 
-The Spring container converts the text inside the `<value/>` element into a
-`java.util.Properties` instance by using the JavaBeans `PropertyEditor` mechanism. This
-is a nice shortcut, and is one of a few places where the Spring team do favor the use of
-the nested `<value/>` element over the `value` attribute style.
+Spring 컨테이너는 JavaBeans `PropertyEditor` 메커니즘을 사용하여 `<value/>` 요소 내부의 텍스트를 `java.util.Properties` 인스턴스로 변환합니다. 이것은 유용한 바로 가기이며, Spring 팀이 `value` 속성 스타일 대신 중첩된 `<value/>` 요소를 선호하는 몇 군데 중 하나입니다.
 
 [[beans-idref-element]]
 === The `idref` element
 
-The `idref` element is simply an error-proof way to pass the `id` (a string value - not
-a reference) of another bean in the container to a `<constructor-arg/>` or `<property/>`
-element. The following example shows how to use it:
+`idref` 요소는 컨테이너 내의 다른 빈의 `id` (참조가 아닌 문자열 값)을 `<constructor-arg/>` 또는 `<property/>` 요소로 전달하는 방법 중 하나로, 오류를 방지하기 위한 간단한 방법입니다. 다음 예제에서는 이를 어떻게 사용하는지 보여줍니다:
 
 [source,xml,indent=0,subs="verbatim,quotes"]
 ----
@@ -99,7 +79,7 @@ element. The following example shows how to use it:
 	</bean>
 ----
 
-The preceding bean definition snippet is exactly equivalent (at runtime) to the
+앞의 빈 정의 스니펫은 (실행 시간에) 다음과 정확히 동등합니다.
 following snippet:
 
 [source,xml,indent=0,subs="verbatim,quotes"]
@@ -111,56 +91,28 @@ following snippet:
 	</bean>
 ----
 
-The first form is preferable to the second, because using the `idref` tag lets the
-container validate at deployment time that the referenced, named bean actually
-exists. In the second variation, no validation is performed on the value that is passed
-to the `targetName` property of the `client` bean. Typos are only discovered (with most
-likely fatal results) when the `client` bean is actually instantiated. If the `client`
-bean is a xref:core/beans/factory-scopes.adoc[prototype] bean, this typo and the resulting exception
-may only be discovered long after the container is deployed.
+첫 번째 형태가 두 번째 형태보다 선호되는 이유는 `idref` 태그를 사용하면 컨테이너가 참조된 이름이 지정한 빈이 실제로 존재하는지 배포 시간에 유효성을 검사할 수 있기 때문입니다. 두 번째 형태에서는 `client` 빈의 `targetName` 속성에 전달되는 값에 대한 유효성 검사가 수행되지 않습니다. 오타는 `client` 빈이 실제로 인스턴스화될 때만 발견됩니다(대부분 치명적인 결과를 초래할 가능성이 높음). 만약 `client` 빈이 xref:core/beans/factory-scopes.adoc[프로토타입] 빈인 경우, 이러한 오타와 그에 따른 예외는 컨테이너가 배포된 후에 오랜 시간이 지난 뒤에만 발견될 수 있습니다.
 
-NOTE: The `local` attribute on the `idref` element is no longer supported in the 4.0 beans
-XSD, since it does not provide value over a regular `bean` reference any more. Change
-your existing `idref local` references to `idref bean` when upgrading to the 4.0 schema.
+참고: 4.0 빈 XSD에서는 `idref` 요소의 `local` 속성이 더 이상 지원되지 않으며, 더 이상 보편적인 `bean` 참조보다 추가 가치를 제공하지 않습니다. 4.0 스키마로 업그레이드할 때 기존의 `idref local` 참조를 `idref bean`으로 변경하십시오.
 
-A common place (at least in versions earlier than Spring 2.0) where the `<idref/>` element
-brings value is in the configuration of xref:core/aop-api/pfb.adoc#aop-pfb-1[AOP interceptors] in a
-`ProxyFactoryBean` bean definition. Using `<idref/>` elements when you specify the
-interceptor names prevents you from misspelling an interceptor ID.
+`ProxyFactoryBean` 빈 정의에서 xref:core/aop-api/pfb.adoc#aop-pfb-1[AOP 인터셉터]를 구성할 때 `<idref/>` 요소가 가치를 제공하는 공통한 장소는 (적어도 Spring 2.0 이전 버전에서) 인터셉터 ID를 잘못 입력하는 것을 방지하는 데 사용됩니다.
 
 
 [[beans-ref-element]]
 == References to Other Beans (Collaborators)
 
-The `ref` element is the final element inside a `<constructor-arg/>` or `<property/>`
-definition element. Here, you set the value of the specified property of a bean to be a
-reference to another bean (a collaborator) managed by the container. The referenced bean
-is a dependency of the bean whose property is to be set, and it is initialized on demand
-as needed before the property is set. (If the collaborator is a singleton bean, it may
-already be initialized by the container.) All references are ultimately a reference to
-another object. Scoping and validation depend on whether you specify the ID or name of the
-other object through the `bean` or `parent` attribute.
+`<ref/>` 요소는 `<constructor-arg/>` 또는 `<property/>` 정의 요소 내부의 마지막 요소입니다. 여기서 빈의 지정된 속성 값을 컨테이너에서 관리하는 다른 빈(협력자)에 대한 참조로 설정합니다. 참조된 빈은 속성을 설정하기 전에 필요한 경우 빈의 종속성이며, 속성을 설정하기 전에 필요한 경우 초기화됩니다(협력자가 싱글톤 빈인 경우 이미 컨테이너에서 초기화될 수 있음). 모든 참조는 궁극적으로 다른 객체에 대한 참조입니다. 범위 및 유효성 검사는 `bean` 또는 `parent` 속성을 통해 다른 객체의 ID 또는 이름을 지정하는 방법에 따라 달라집니다.
 
-Specifying the target bean through the `bean` attribute of the `<ref/>` tag is the most
-general form and allows creation of a reference to any bean in the same container or
-parent container, regardless of whether it is in the same XML file. The value of the
-`bean` attribute may be the same as the `id` attribute of the target bean or be the same
-as one of the values in the `name` attribute of the target bean. The following example
-shows how to use a `ref` element:
+`<ref/>` 태그의 `bean` 속성을 통해 대상 빈을 지정하는 것은 가장 일반적인 형태로, 동일한 컨테이너 또는 부모 컨테이너 내에서 XML 파일이 동일한 여부에 관계없이 동일한 컨테이너 또는 부모 컨테이너 내의 어떤 빈에 대한 참조를 생성할 수 있습니다. `bean` 속성의 값은 대상 빈의 `id` 속성과 동일하거나 대상 빈의 `name` 속성 값 중 하나와 동일할 수 있습니다. 다음 예제는 `ref` 요소를 사용하는 방법을 보여줍니다:
 
 [source,xml,indent=0,subs="verbatim,quotes"]
 ----
 	<ref bean="someBean"/>
 ----
 
-Specifying the target bean through the `parent` attribute creates a reference to a bean
-that is in a parent container of the current container. The value of the `parent`
-attribute may be the same as either the `id` attribute of the target bean or one of the
-values in the `name` attribute of the target bean. The target bean must be in a
-parent container of the current one. You should use this bean reference variant mainly
-when you have a hierarchy of containers and you want to wrap an existing bean in a parent
-container with a proxy that has the same name as the parent bean. The following pair of
-listings shows how to use the `parent` attribute:
+`parent` 속성을 통해 대상 빈을 지정하면 현재 컨테이너의 부모 컨테이너에 있는 빈에 대한 참조를 생성합니다. 
+`parent` 속성의 값은 대상 빈의 `id` 속성 또는 대상 빈의 `name` 속성 값 중 하나와 동일할 수 있습니다.
+대상 빈은 현재 컨테이너의 부모 컨테이너에 있어야 합니다. 이 빈 참조 변형은 주로 컨테이너의 계층 구조가 있고 부모 컨테이너에 있는 기존 빈을 동일한 이름을 가진 부모 빈을 갖는 프록시로 래핑하려는 경우에 사용해야 합니다. 다음 두 코드 예제는 `parent` 속성을 사용하는 방법을 보여줍니다:
 
 [source,xml,indent=0,subs="verbatim,quotes"]
 ----
@@ -206,17 +158,9 @@ inner bean, as the following example shows:
 	</bean>
 ----
 
-An inner bean definition does not require a defined ID or name. If specified, the container
-does not use such a value as an identifier. The container also ignores the `scope` flag on
-creation, because inner beans are always anonymous and are always created with the outer
-bean. It is not possible to access inner beans independently or to inject them into
-collaborating beans other than into the enclosing bean.
+내부 빈 정의는 정의된 ID나 이름이 필요하지 않습니다. 지정된 경우 컨테이너는 해당 값을 식별자로 사용하지 않습니다. 또한 컨테이너는 생성 시 `scope` 플래그를 무시합니다. 왜냐하면 내부 빈은 항상 익명이며 항상 외부 빈과 함께 생성되기 때문입니다. 내부 빈에 독립적으로 액세스하거나 그것들을 외부 빈 이외의 협력 빈에 주입하는 것은 불가능합니다. 
 
-As a corner case, it is possible to receive destruction callbacks from a custom scope --
-for example, for a request-scoped inner bean contained within a singleton bean. The creation
-of the inner bean instance is tied to its containing bean, but destruction callbacks let it
-participate in the request scope's lifecycle. This is not a common scenario. Inner beans
-typically simply share their containing bean's scope.
+한 가지 특별한 경우로, 사용자 정의 스코프에서 파생된 파괴(callback) 콜백을 받을 수 있습니다. 예를 들어 싱글톤 빈 내부에 포함된 요청 범위 내부 빈의 경우입니다. 내부 빈 인스턴스의 생성은 포함 빈에 연결되지만, 파괴(callback) 콜백을 통해 요청 범위의 라이프사이클에 참여할 수 있습니다. 이것은 일반적인 시나리오가 아닙니다. 내부 빈은 일반적으로 포함 빈의 스코프를 공유합니다.
 
 
 [[beans-collection-elements]]
@@ -272,18 +216,9 @@ following elements:
 [[beans-collection-elements-merging]]
 === Collection Merging
 
-The Spring container also supports merging collections. An application
-developer can define a parent `<list/>`, `<map/>`, `<set/>` or `<props/>` element
-and have child `<list/>`, `<map/>`, `<set/>` or `<props/>` elements inherit and
-override values from the parent collection. That is, the child collection's values are
-the result of merging the elements of the parent and child collections, with the child's
-collection elements overriding values specified in the parent collection.
+Spring 컨테이너는 컬렉션 병합도 지원합니다. 애플리케이션 개발자는 부모 `<list/>`, `<map/>`, `<set/>`, 또는 `<props/>` 요소를 정의하고 자식 `<list/>`, `<map/>`, `<set/>`, 또는 `<props/>` 요소가 부모 컬렉션에서 값을 상속하고 재정의하도록 할 수 있습니다. 즉, 자식 컬렉션의 값은 부모 컬렉션과 자식 컬렉션의 요소를 병합한 결과로, 자식 컬렉션의 요소는 부모 컬렉션에서 지정된 값에 재정의됩니다.
 
-This section on merging discusses the parent-child bean mechanism. Readers unfamiliar
-with parent and child bean definitions may wish to read the
-xref:core/beans/child-bean-definitions.adoc[relevant section] before continuing.
-
-The following example demonstrates collection merging:
+이 병합에 대한 섹션은 부모-자식 빈 메커니즘을 다룹니다. 부모와 자식 빈 정의에 익숙하지 않은 독자는 계속하기 전에 관련 섹션을 읽는 것이 좋습니다. 아래의 예제는 컬렉션 병합을 보여줍니다:
 
 [source,xml,indent=0,subs="verbatim,quotes"]
 ----
@@ -308,12 +243,7 @@ The following example demonstrates collection merging:
 	<beans>
 ----
 
-Notice the use of the `merge=true` attribute on the `<props/>` element of the
-`adminEmails` property of the `child` bean definition. When the `child` bean is resolved
-and instantiated by the container, the resulting instance has an `adminEmails`
-`Properties` collection that contains the result of merging the child's
-`adminEmails` collection with the parent's `adminEmails` collection. The following listing
-shows the result:
+`child` 빈 정의의 `adminEmails` 속성의 `<props/>` 요소에 있는 `merge=true` 속성을 주목하세요. 컨테이너가 `child` 빈을 해결하고 인스턴스화할 때, 결과 인스턴스에는 자식의 `adminEmails` 컬렉션을 부모의 `adminEmails` 컬렉션과 병합한 결과가 포함된 `Properties` 컬렉션이 있습니다. 아래 코드는 결과를 보여줍니다:
 
 [literal,subs="verbatim,quotes"]
 ----
@@ -322,37 +252,19 @@ sales=sales@example.com
 support=support@example.co.uk
 ----
 
-The child `Properties` collection's value set inherits all property elements from the
-parent `<props/>`, and the child's value for the `support` value overrides the value in
-the parent collection.
+자식 `Properties` 컬렉션의 값 집합은 부모 `<props/>`에서 모든 property 요소를 상속받으며, 자식의 `support` 값은 부모 컬렉션의 값에 재정의됩니다.
 
-This merging behavior applies similarly to the `<list/>`, `<map/>`, and `<set/>`
-collection types. In the specific case of the `<list/>` element, the semantics
-associated with the `List` collection type (that is, the notion of an `ordered`
-collection of values) is maintained. The parent's values precede all of the child list's
-values. In the case of the `Map`, `Set`, and `Properties` collection types, no ordering
-exists. Hence, no ordering semantics are in effect for the collection types that underlie
-the associated `Map`, `Set`, and `Properties` implementation types that the container
-uses internally.
+이러한 병합 동작은 `<list/>`, `<map/>`, 및 `<set/>` 컬렉션 유형에 대해서도 유사하게 적용됩니다. 특히 `<list/>` 요소의 경우 `List` 컬렉션 유형과 관련된 의미론(즉, `ordered` 값의 컬렉션 개념)이 유지됩니다. 부모의 값은 모든 자식 리스트의 값 앞에 나옵니다. 반면에 `Map`, `Set`, 및 `Properties` 컬렉션 유형의 경우 순서가 없습니다. 따라서 컨테이너가 내부적으로 사용하는 관련 `Map`, `Set`, 및 `Properties` 구현 유형에 대한 컬렉션 유형에 대한 순서 의미론은 적용되지 않습니다.
 
 [[beans-collection-merge-limitations]]
 === Limitations of Collection Merging
 
-You cannot merge different collection types (such as a `Map` and a `List`). If you
-do attempt to do so, an appropriate `Exception` is thrown. The `merge` attribute must be
-specified on the lower, inherited, child definition. Specifying the `merge` attribute on
-a parent collection definition is redundant and does not result in the desired merging.
+다른 컬렉션 유형(예: `Map` 및 `List`)을 병합할 수 없습니다. 이렇게 시도하면 적절한 예외가 발생합니다. `merge` 속성은 상속된 하위 자식 정의에서 지정해야 합니다. 부모 컬렉션 정의에 `merge` 속성을 지정하는 것은 중복되며 원하는 병합 결과를 얻을 수 없습니다.
 
 [[beans-collection-elements-strongly-typed]]
 === Strongly-typed collection
 
-Thanks to Java's support for generic types, you can use strongly typed collections.
-That is, it is possible to declare a `Collection` type such that it can only contain
-(for example) `String` elements. If you use Spring to dependency-inject a
-strongly-typed `Collection` into a bean, you can take advantage of Spring's
-type-conversion support such that the elements of your strongly-typed `Collection`
-instances are converted to the appropriate type prior to being added to the `Collection`.
-The following Java class and bean definition show how to do so:
+Java의 제네릭 타입 지원 덕분에 강력한 형식화된 컬렉션을 사용할 수 있습니다. 즉, `Collection` 유형을 선언하여 (예: `String` 요소만 포함 가능한) 특정 타입의 요소만 포함될 수 있도록 할 수 있습니다. Spring을 사용하여 강력한 형식화된 `Collection`을 빈에 주입하면 Spring의 타입 변환 지원을 활용하여 강력한 형식화된 `Collection` 인스턴스의 요소가 컬렉션에 추가되기 전에 적절한 타입으로 변환됩니다. 다음의 Java 클래스와 빈 정의는 이를 어떻게 수행하는지 보여줍니다:
 
 [tabs]
 ======
@@ -395,19 +307,13 @@ class SomeClass {
 	</beans>
 ----
 
-When the `accounts` property of the `something` bean is prepared for injection, the generics
-information about the element type of the strongly-typed `Map<String, Float>` is
-available by reflection. Thus, Spring's type conversion infrastructure recognizes the
-various value elements as being of type `Float`, and the string values (`9.99`, `2.75`, and
-`3.99`) are converted into an actual `Float` type.
+`something` 빈의 `accounts` 속성이 주입 준비될 때, 강력한 형식화된 `Map<String, Float>`의 요소 유형에 대한 제네릭 정보가 리플렉션을 통해 사용 가능합니다. 따라서 Spring의 타입 변환 인프라는 다양한 값 요소를 `Float` 타입으로 인식하고 문자열 값(`9.99`, `2.75`, `3.99`)이 실제 `Float` 타입으로 변환됩니다.
 
 
 [[beans-null-element]]
 == Null and Empty String Values
 
-Spring treats empty arguments for properties and the like as empty `Strings`. The
-following XML-based configuration metadata snippet sets the `email` property to the empty
-`String` value ("").
+Spring은 속성과 같은 빈에 대한 빈 인자가 비어있는 경우를 빈 문자열("")로 처리합니다. 다음과 같은 XML 기반 구성 메타데이터 스니펫은 `email` 속성을 빈 문자열("") 값으로 설정합니다.
 
 [source,xml,indent=0,subs="verbatim,quotes"]
 ----
@@ -470,16 +376,11 @@ Kotlin::
 [[beans-p-namespace]]
 == XML Shortcut with the p-namespace
 
-The p-namespace lets you use the `bean` element's attributes (instead of nested
-`<property/>` elements) to describe your property values collaborating beans, or both.
+p-네임스페이스를 사용하면 `<property/>` 요소의 중첩 대신 `bean` 요소의 속성을 사용하여 속성 값을 정의하거나 협력 빈을 설명할 수 있습니다.
 
-Spring supports extensible configuration formats xref:core/appendix/xsd-schemas.adoc[with namespaces],
-which are based on an XML Schema definition. The `beans` configuration format discussed in
-this chapter is defined in an XML Schema document. However, the p-namespace is not defined
-in an XSD file and exists only in the core of Spring.
+Spring은 XML 스키마 정의를 기반으로 한 xref:core/appendix/xsd-schemas.adoc[네임스페이스를 사용한] 확장 가능한 구성 형식을 지원합니다. 이 장에서 다루는 `beans` 구성 형식은 XML 스키마 문서에 정의되어 있습니다. 그러나 p-네임스페이스는 XSD 파일에 정의되어 있지 않으며 Spring의 핵심 부분에서만 사용할 수 있습니다.
 
-The following example shows two XML snippets (the first uses
-standard XML format and the second uses the p-namespace) that resolve to the same result:
+다음 예제는 두 개의 XML 스니펫을 보여줍니다 (첫 번째는 표준 XML 형식을 사용하고 두 번째는 p-네임스페이스를 사용합니다). 이 두 예제는 동일한 결과를 얻습니다.
 
 [source,xml,indent=0,subs="verbatim,quotes"]
 ----
@@ -498,13 +399,9 @@ standard XML format and the second uses the p-namespace) that resolve to the sam
 	</beans>
 ----
 
-The example shows an attribute in the p-namespace called `email` in the bean definition.
-This tells Spring to include a property declaration. As previously mentioned, the
-p-namespace does not have a schema definition, so you can set the name of the attribute
-to the property name.
+이 예제에서는 빈 정의에서 p-네임스페이스의 `email`이라는 속성을 보여줍니다. 이것은 Spring에게 속성 선언을 포함하도록 지시하는 것입니다. 앞서 언급한대로 p-네임스페이스에는 스키마 정의가 없으므로 속성 이름을 속성 이름으로 설정할 수 있습니다.
 
-This next example includes two more bean definitions that both have a reference to
-another bean:
+다음 예제에는 다른 빈에 대한 참조를 가진 두 개의 빈 정의가 더 포함되어 있습니다:
 
 [source,xml,indent=0,subs="verbatim,quotes"]
 ----
@@ -530,30 +427,17 @@ another bean:
 	</beans>
 ----
 
-This example includes not only a property value using the p-namespace
-but also uses a special format to declare property references. Whereas the first bean
-definition uses `<property name="spouse" ref="jane"/>` to create a reference from bean
-`john` to bean `jane`, the second bean definition uses `p:spouse-ref="jane"` as an
-attribute to do the exact same thing. In this case, `spouse` is the property name,
-whereas the `-ref` part indicates that this is not a straight value but rather a
-reference to another bean.
+이 예제는 p-네임스페이스를 사용하여 속성 값뿐만 아니라 속성 참조를 선언하는 특별한 형식도 포함하고 있습니다. 첫 번째 빈 정의에서는 빈 `john`에서 빈 `jane`으로의 참조를 만들기 위해 `<property name="spouse" ref="jane"/>`를 사용하는 반면, 두 번째 빈 정의에서는 동일한 작업을 수행하는 데 `p:spouse-ref="jane"`를 속성으로 사용합니다. 이 경우 `spouse`는 속성 이름이며 `-ref` 부분은 이것이 직접적인 값이 아닌 다른 빈에 대한 참조임을 나타냅니다.
 
-NOTE: The p-namespace is not as flexible as the standard XML format. For example, the format
-for declaring property references clashes with properties that end in `Ref`, whereas the
-standard XML format does not. We recommend that you choose your approach carefully and
-communicate this to your team members to avoid producing XML documents that use all
-three approaches at the same time.
+참고: p-네임스페이스는 표준 XML 형식만큼 유연하지 않습니다. 예를 들어, 속성 이름이 `Ref`로 끝나는 경우 속성 참조를 선언하는 형식이 충돌할 수 있지만 표준 XML 형식은 그렇지 않습니다. 동시에 세 가지 접근 방식을 사용하는 XML 문서를 생성하지 않도록 주의하고 팀원들과 이를 의사소통하는 것이 좋습니다.
 
 
 [[beans-c-namespace]]
 == XML Shortcut with the c-namespace
 
-Similar to the xref:core/beans/dependencies/factory-properties-detailed.adoc#beans-p-namespace[XML Shortcut with the p-namespace], the c-namespace, introduced in Spring
-3.1, allows inlined attributes for configuring the constructor arguments rather
-then nested `constructor-arg` elements.
+p-네임스페이스의 xref:core/beans/dependencies/factory-properties-detailed.adoc#beans-p-namespace[XML 단축키와 유사하게], Spring 3.1에서 소개된 c-네임스페이스는 중첩된 `constructor-arg` 요소 대신 생성자 인자를 구성하기 위한 인라인 속성을 허용합니다.
 
-The following example uses the `c:` namespace to do the same thing as the from
-xref:core/beans/dependencies/factory-collaborators.adoc#beans-constructor-injection[Constructor-based Dependency Injection]:
+다음 예제는 `c:` 네임스페이스를 사용하여 xref:core/beans/dependencies/factory-collaborators.adoc#beans-constructor-injection[생성자 기반 의존성 주입]에서 수행하는 것과 동일한 작업을 수행합니다:
 
 [source,xml,indent=0,subs="verbatim,quotes"]
 ----
@@ -580,14 +464,9 @@ xref:core/beans/dependencies/factory-collaborators.adoc#beans-constructor-inject
 	</beans>
 ----
 
-The `c:` namespace uses the same conventions as the `p:` one (a trailing `-ref` for
-bean references) for setting the constructor arguments by their names. Similarly,
-it needs to be declared in the XML file even though it is not defined in an XSD schema
-(it exists inside the Spring core).
+`c:` 네임스페이스는 생성자 인자를 이름으로 설정하기 위해 `p:`와 동일한 규칙을 사용합니다 (빈 참조에 대한 `-ref`가 뒤에 붙음). 마찬가지로 이를 XML 파일에 선언해야 하지만 XSD 스키마에 정의되어 있지 않습니다 (Spring 코어 내에 존재합니다).
 
-For the rare cases where the constructor argument names are not available (usually if
-the bytecode was compiled without debugging information), you can use fallback to the
-argument indexes, as follows:
+생성자 인자 이름이 사용 불가능한 희귀한 경우 (보통 디버깅 정보를 포함하지 않고 바이트코드를 컴파일한 경우), 다음과 같이 인수 인덱스로 대체할 수 있습니다:
 
 [source,xml,indent=0,subs="verbatim,quotes"]
 ----
@@ -596,23 +475,15 @@ argument indexes, as follows:
 		c:_2="something@somewhere.com"/>
 ----
 
-NOTE: Due to the XML grammar, the index notation requires the presence of the leading `_`,
-as XML attribute names cannot start with a number (even though some IDEs allow it).
-A corresponding index notation is also available for `<constructor-arg>` elements but
-not commonly used since the plain order of declaration is usually sufficient there.
+참고: XML 문법으로 인해 인덱스 표기법은 선행 `_`의 존재를 요구합니다. XML 속성 이름은 숫자로 시작할 수 없기 때문입니다 (일부 IDE에서는 허용되지만). `<constructor-arg>` 요소에 대한 대응하는 인덱스 표기법도 있지만 일반적으로 선언 순서만으로 충분하기 때문에 일반적으로 사용되지 않습니다.
 
-In practice, the constructor resolution
-xref:core/beans/dependencies/factory-collaborators.adoc#beans-factory-ctor-arguments-resolution[mechanism] is quite efficient in matching
-arguments, so unless you really need to, we recommend using the name notation
-throughout your configuration.
+실제로 생성자 해결 xref:core/beans/dependencies/factory-collaborators.adoc#beans-factory-ctor-arguments-resolution[메커니즘]은 인수를 일치시키는 데 매우 효율적이므로 필요하지 않는 경우에는 구성 전체에서 이름 표기법을 사용하는 것을 권장합니다.
 
 
 [[beans-compound-property-names]]
 == Compound Property Names
 
-You can use compound or nested property names when you set bean properties, as long as
-all components of the path except the final property name are not `null`. Consider the
-following bean definition:
+빈 속성을 설정할 때 마지막 속성 이름을 제외한 경로의 모든 구성 요소가 `null`이 아닌 한 복합 또는 중첩된 속성 이름을 사용할 수 있습니다. 다음과 같은 빈 정의를 고려해보세요:
 
 [source,xml,indent=0,subs="verbatim,quotes"]
 ----
@@ -621,9 +492,6 @@ following bean definition:
 	</bean>
 ----
 
-The `something` bean has a `fred` property, which has a `bob` property, which has a `sammy`
-property, and that final `sammy` property is being set to a value of `123`. In order for
-this to work, the `fred` property of `something` and the `bob` property of `fred` must not
-be `null` after the bean is constructed. Otherwise, a `NullPointerException` is thrown.
+`something` 빈은 `fred` 속성을 가지고 있으며 이 속성은 `bob` 속성을 가지고 있고, 그 `bob` 속성은 `sammy` 속성에 값을 `123`으로 설정하고 있습니다. 이 작업을 수행하기 위해서는 `something`의 `fred` 속성과 `fred`의 `bob` 속성이 빈이 생성된 후에 `null`이 아니어야 합니다. 그렇지 않으면 `NullPointerException`이 발생합니다.
 
 
