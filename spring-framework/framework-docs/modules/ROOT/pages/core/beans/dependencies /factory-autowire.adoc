@@ -34,7 +34,6 @@ XML 기반 구성 메타데이터를 사용할 때 (<bean/> 요소의 autowire �
 예상된 키 유형이 `String`인 경우 강력한 형식화된 `Map` 인스턴스를 자동으로 연결할 수 있습니다.
 자동 연결된 `Map` 인스턴스의 값은 예상된 유형과 일치하는 모든 빈 인스턴스이며, `Map` 인스턴스의 키에는 해당하는 빈 이름이 포함됩니다.
 
-
 [[beans-autowired-exceptions]]
 == Limitations and Disadvantages of Autowiring
 
@@ -51,7 +50,7 @@ XML 기반 구성 메타데이터를 사용할 때 (<bean/> 요소의 autowire �
 후자의 경우 여러 옵션이 있습니다.:
 
 * 명시적인 연결을 위해 autowiring을 포기합니다.
-* `autowire-candidate` 속성을 `false`로 설정하여 해당 빈 정의의 autowiring을 피합니다. 자세한 내용은 xref:core/beans/dependencies/factory-autowire.adoc#beans-factory-autowire-candidate[next section]을 참조하세요.
+* `autowire-candidate` 속성을 `false` 로 설정하여 해당 빈 정의의 autowiring을 피합니다. 자세한 내용은 xref:core/beans/dependencies/factory-autowire.adoc#beans-factory-autowire-candidate[next section]을 참조하세요.
 * `<bean/>` 요소의 `primary` 속성을 `true`로 설정하여 단일 빈 정의를 주요 후보로 지정합니다.
 * xref:core/beans/annotation-config.adoc[Annotation-based Container Configuration]에서 설명하는 주석 기반 구성을 통해 더 정교한 제어를 구현합니다.
 
