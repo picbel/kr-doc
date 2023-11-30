@@ -85,12 +85,10 @@ Kotlin::
 ----
 ======
 
-The preceding is not desirable, because the business code is aware of and coupled to the
-Spring Framework. Method Injection, a somewhat advanced feature of the Spring IoC
-container, lets you handle this use case cleanly.
+앞의 방법은 Spring Framework에 의존하고 있으며 비즈니스 코드가 Spring Framework에 결합되어 있기 때문에 바람직하지 않습니다. 메서드 인젝션(Method Injection)은 Spring IoC 컨테이너의 고급 기능 중 하나로, 이러한 사용 사례를 깔끔하게 처리할 수 있게 해줍니다.
 
 ****
-You can read more about the motivation for Method Injection in
+Method Injection의 동기에 대한 더 자세한 내용은 다음에서 확인할 수 있습니다.
 {spring-site-blog}/2004/08/06/method-injection/[this blog entry].
 ****
 
@@ -99,31 +97,20 @@ You can read more about the motivation for Method Injection in
 [[beans-factory-lookup-method-injection]]
 == Lookup Method Injection
 
-Lookup method injection is the ability of the container to override methods on
-container-managed beans and return the lookup result for another named bean in the
-container. The lookup typically involves a prototype bean, as in the scenario described
-in xref:core/beans/dependencies/factory-method-injection.adoc[the preceding section]. The Spring Framework
-implements this method injection by using bytecode generation from the CGLIB library to
-dynamically generate a subclass that overrides the method.
+Lookup 메서드 주입은 컨테이너가 컨테이너 관리 빈의 메서드를 오버라이드하고 컨테이너 내의 다른 이름을 가진 빈에 대한 조회 결과를 반환하는 기능입니다. 
+이 조회는 일반적으로 프로토타입 빈과 관련이 있으며, 이전 섹션에서 설명한 시나리오와 같습니다.
+Spring Framework는 이 메서드 주입을 구현하기 위해 CGLIB 라이브러리에서 바이트코드 생성을 사용하여 동적으로 메서드를 오버라이드하는 하위 클래스를 생성합니다.
 
 [NOTE]
 ====
-* For this dynamic subclassing to work, the class that the Spring bean container
-  subclasses cannot be `final`, and the method to be overridden cannot be `final`, either.
-* Unit-testing a class that has an `abstract` method requires you to subclass the class
-  yourself and to supply a stub implementation of the `abstract` method.
-* Concrete methods are also necessary for component scanning, which requires concrete
-  classes to pick up.
-* A further key limitation is that lookup methods do not work with factory methods and
-  in particular not with `@Bean` methods in configuration classes, since, in that case,
-  the container is not in charge of creating the instance and therefore cannot create
-  a runtime-generated subclass on the fly.
+* 이 동적 서브클래스 생성이 작동하려면 Spring 빈 컨테이너에서 서브클래스화할 클래스는 `final`일 수 없으며, 오버라이드될 메서드 역시 `final`일 수 없습니다.
+* `abstract` 메서드가 있는 클래스를 유닛 테스트하려면 해당 클래스를 직접 서브클래스화하고 `abstract` 메서드의 스텁 구현을 제공해야 합니다.
+* 구성 요소 스캐닝을 위해 구체적인 메서드도 필요하며, 구체적인 클래스를 선택해야 합니다.
+* 더 중요한 제한 사항 중 하나는 조회 메서드가 팩토리 메서드와 특히 구성 클래스의 `@Bean` 메서드와 함께 작동하지 않는다는 것입니다. 이 경우 컨테이너가 인스턴스를 생성하는 주체가 아니므로 런타임에 동적으로 생성된 서브클래스를 만들 수 없습니다.
 ====
 
-In the case of the `CommandManager` class in the previous code snippet, the
-Spring container dynamically overrides the implementation of the `createCommand()`
-method. The `CommandManager` class does not have any Spring dependencies, as
-the reworked example shows:
+이전 코드 스니펫에서 `CommandManager` 클래스의 경우, Spring 컨테이너는 `createCommand()` 메서드의 구현을 동적으로 재정의합니다. 재작성된 예제에서 보듯이, `CommandManager` 클래스는 Spring 종속성이 없습니다 
+as the reworked example shows:
 
 [tabs]
 ======
@@ -182,9 +169,7 @@ case), the method to be injected requires a signature of the following form:
 	<public|protected> [abstract] <return-type> theMethodName(no-arguments);
 ----
 
-If the method is `abstract`, the dynamically-generated subclass implements the method.
-Otherwise, the dynamically-generated subclass overrides the concrete method defined in
-the original class. Consider the following example:
+만약 메서드가 `abstract`이라면, 동적으로 생성된 하위 클래스가 해당 메서드를 구현합니다. 그렇지 않으면, 동적으로 생성된 하위 클래스가 원래 클래스에 정의된 구체적인 메서드를 오버라이드합니다. 다음 예제를 고려해보세요.:
 
 [source,xml,indent=0,subs="verbatim,quotes"]
 ----
@@ -285,18 +270,11 @@ Kotlin::
 ----
 ======
 
-Note that you should typically declare such annotated lookup methods with a concrete
-stub implementation, in order for them to be compatible with Spring's component
-scanning rules where abstract classes get ignored by default. This limitation does not
-apply to explicitly registered or explicitly imported bean classes.
+일반적으로 Spring의 구성 요소 스캐닝 규칙과 호환되도록 이러한 주석이 달린 조회 메서드를 구체적인 스텁 구현과 함께 선언해야 합니다. 이 제한 사항은 명시적으로 등록되거나 명시적으로 가져온 빈 클래스에는 적용되지 않습니다.
 
 [TIP]
 ====
-Another way of accessing differently scoped target beans is an `ObjectFactory`/
-`Provider` injection point. See xref:core/beans/factory-scopes.adoc#beans-factory-scopes-other-injection[Scoped Beans as Dependencies].
-
-You may also find the `ServiceLocatorFactoryBean` (in the
-`org.springframework.beans.factory.config` package) to be useful.
+다른 범위의 대상 빈에 액세스하는 또 다른 방법은 `ObjectFactory`/`Provider` 주입 지점입니다. `org.springframework.beans.factory.config` 패키지의 `ServiceLocatorFactoryBean`도 유용할 수 있습니다.
 ====
 
 
@@ -304,13 +282,9 @@ You may also find the `ServiceLocatorFactoryBean` (in the
 [[beans-factory-arbitrary-method-replacement]]
 == Arbitrary Method Replacement
 
-A less useful form of method injection than lookup method injection is the ability to
-replace arbitrary methods in a managed bean with another method implementation. You
-can safely skip the rest of this section until you actually need this functionality.
+룩업 메서드 주입보다 덜 유용한 메서드 주입 형식은 관리되는 빈의 임의의 메서드를 다른 메서드 구현으로 교체하는 능력입니다. 실제로 이 기능이 필요할 때까지는 이 섹션의 나머지 부분을 건너뛰어도 됩니다.
 
-With XML-based configuration metadata, you can use the `replaced-method` element to
-replace an existing method implementation with another, for a deployed bean. Consider
-the following class, which has a method called `computeValue` that we want to override:
+XML 기반 구성 메타데이터를 사용하면 배포된 빈의 기존 메서드 구현을 다른 것으로 대체하기 위해 `replaced-method` 요소를 사용할 수 있습니다. 다음과 같은 클래스를 고려해보세요. 이 클래스에는 `computeValue`라는 메서드가 있으며 이를 덮어쓰고자 합니다:
 
 [tabs]
 ======
@@ -404,12 +378,7 @@ resemble the following example:
 	<bean id="replacementComputeValue" class="a.b.c.ReplacementComputeValue"/>
 ----
 
-You can use one or more `<arg-type/>` elements within the `<replaced-method/>`
-element to indicate the method signature of the method being overridden. The signature
-for the arguments is necessary only if the method is overloaded and multiple variants
-exist within the class. For convenience, the type string for an argument may be a
-substring of the fully qualified type name. For example, the following all match
-`java.lang.String`:
+`<replaced-method/>` 요소 내에서 하나 이상의 `<arg-type/>` 요소를 사용하여 덮어쓰려는 메서드의 메서드 시그니처를 나타낼 수 있습니다. 인수에 대한 시그니처는 메서드가 오버로드되고 클래스 내에서 여러 가지 변형이 있는 경우에만 필요합니다. 편의를 위해 인수의 타입 문자열은 완전한 패키지 경로를 포함하지 않고도 사용할 수 있습니다. 예를 들어 다음은 모두 `java.lang.String`과 일치합니다.:
 
 [source,java,indent=0,subs="verbatim,quotes"]
 ----
@@ -418,8 +387,6 @@ substring of the fully qualified type name. For example, the following all match
 	Str
 ----
 
-Because the number of arguments is often enough to distinguish between each possible
-choice, this shortcut can save a lot of typing, by letting you type only the
-shortest string that matches an argument type.
+인수의 수가 종종 각 가능한 선택 사이를 구분하는 데 충분하기 때문에 이 단축키는 많은 타이핑을 절약할 수 있습니다. 인수 타입과 일치하는 가장 짧은 문자열만 입력하면 됩니다.
 
 
