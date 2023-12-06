@@ -64,14 +64,12 @@ XML에서 빈을 싱글톤으로 정의하려면 다음 예제와 같이 빈을 
 
 빈 배치의 싱글톤 범위(scope)이 아닌 프로토타입 범위(scope)는 특정 빈에 대한 요청이 있을 때마다 새로운 빈 인스턴스가 생성됩니다. 즉, 빈은 다른 빈에 주입되거나 컨테이너에서 `getBean()` 메서드를 통해 요청될 때마다 새로운 인스턴스가 생성됩니다. 원칙적으로, 상태를 가지는 빈에는 프로토타입 범위를 사용하고 상태를 가지지 않는 빈에는 싱글톤 범위를 사용해야 합니다.
 
-The following diagram illustrates the Spring prototype scope:
+다음 다이어그램은 Spring 프로토타입 범위(scope)를 설명합니다.:
 
 image::prototype.png[]
 
-(A data access object
-(DAO) is not typically configured as a prototype, because a typical DAO does not hold
-any conversational state. It was easier for us to reuse the core of the
-singleton diagram.)
+
+(데이터 액세스 객체(DAO)는 일반적으로 프로토타입으로 구성되지 않습니다. 왜냐하면 일반적인 DAO는 대화형 상태를 유지하지 않기 때문입니다. 우리에게는 싱글톤 다이어그램의 핵심을 재사용하는 것이 더 쉬웠습니다.)
 
 The following example defines a bean as a prototype in XML:
 
@@ -80,72 +78,37 @@ The following example defines a bean as a prototype in XML:
 	<bean id="accountService" class="com.something.DefaultAccountService" scope="prototype"/>
 ----
 
-In contrast to the other scopes, Spring does not manage the complete lifecycle of a
-prototype bean. The container instantiates, configures, and otherwise assembles a
-prototype object and hands it to the client, with no further record of that prototype
-instance. Thus, although initialization lifecycle callback methods are called on all
-objects regardless of scope, in the case of prototypes, configured destruction
-lifecycle callbacks are not called. The client code must clean up prototype-scoped
-objects and release expensive resources that the prototype beans hold. To get
-the Spring container to release resources held by prototype-scoped beans, try using a
-custom xref:core/beans/factory-extension.adoc#beans-factory-extension-bpp[bean post-processor]
-which holds a reference to beans that need to be cleaned up.
+다른 범위와는 대조적으로, 스프링은 프로토타입 빈의 전체 라이프사이클을 관리하지 않습니다. 컨테이너는 프로토타입 객체를 인스턴스화하고 구성하며 기타 조립 작업을 수행한 다음 이를 클라이언트에 전달하며 해당 프로토타입 인스턴스에 대한 추가적인 기록을 유지하지 않습니다. 따라서 초기화 라이프사이클 콜백 메서드는 범위와 관계없이 모든 객체에 대해 호출되지만 프로토타입의 경우 구성된 소멸 라이프사이클 콜백은 호출되지 않습니다. 클라이언트 코드는 프로토타입 범위 객체를 정리하고 프로토타입 빈이 보유한 비용이 많이 드는 리소스를 해제해야 합니다. 스프링 컨테이너가 프로토타입 범위 빈이 보유한 리소스를 해제하도록 하려면 정리가 필요한 빈에 대한 참조를 유지하는 [빈 후처리기(bean post-processor)](xref:core/beans/factory-extension.adoc#beans-factory-extension-bpp)를 사용해 보십시오.
 
-In some respects, the Spring container's role in regard to a prototype-scoped bean is a
-replacement for the Java `new` operator. All lifecycle management past that point must
-be handled by the client. (For details on the lifecycle of a bean in the Spring
-container, see xref:core/beans/factory-nature.adoc#beans-factory-lifecycle[Lifecycle Callbacks].)
+어떤 측면에서는 스프링 컨테이너의 역할이 프로토타입 범위 빈에 대한 Java `new` 연산자의 대체로 작용합니다. 이 지점 이후의 모든 라이프사이클 관리는 클라이언트가 처리해야 합니다. (스프링 컨테이너 내에서 빈의 라이프사이클에 대한 자세한 내용은 [라이프사이클 콜백](xref:core/beans/factory-nature.adoc#beans-factory-lifecycle)을 참조하십시오.)
 
 
 
 [[beans-factory-scopes-sing-prot-interaction]]
 == Singleton Beans with Prototype-bean Dependencies
 
-When you use singleton-scoped beans with dependencies on prototype beans, be aware that
-dependencies are resolved at instantiation time. Thus, if you dependency-inject a
-prototype-scoped bean into a singleton-scoped bean, a new prototype bean is instantiated
-and then dependency-injected into the singleton bean. The prototype instance is the sole
-instance that is ever supplied to the singleton-scoped bean.
+싱글톤 범위(scope) 빈이 프로토타입 범위 빈에 의존하는 경우, 의존성은 인스턴스화 시점에 해결됨을 인지해야 합니다. 따라서 프로토타입 범위 빈을 싱글톤 범위 빈에 의존성 주입하면 새로운 프로토타입 빈이 인스턴스화되고 그런 다음 싱글톤 빈에 의존성 주입됩니다. 프로토타입 인스턴스는 싱글톤 범위 빈에 제공되는 유일한 인스턴스입니다.
 
-However, suppose you want the singleton-scoped bean to acquire a new instance of the
-prototype-scoped bean repeatedly at runtime. You cannot dependency-inject a
-prototype-scoped bean into your singleton bean, because that injection occurs only
-once, when the Spring container instantiates the singleton bean and resolves
-and injects its dependencies. If you need a new instance of a prototype bean at
-runtime more than once, see xref:core/beans/dependencies/factory-method-injection.adoc[Method Injection].
+그러나 런타임에서 싱글톤 범위 빈이 반복적으로 프로토타입 범위 빈의 새 인스턴스를 얻어야 하는 경우에는 주의가 필요합니다. 싱글톤 범위 빈에 프로토타입 범위 빈을 의존성으로 주입하는 것은 불가능합니다. 왜냐하면 이 주입은 스프링 컨테이너가 싱글톤 빈을 인스턴스화하고 의존성을 해결하고 주입할 때 단 한 번만 발생하기 때문입니다. 런타임 중에 프로토타입 빈의 새 인스턴스를 여러 번 필요로 하는 경우, [메서드 주입(Method Injection)](xref:core/beans/dependencies/factory-method-injection.adoc)을 참조해야 합니다.
 
 
 
 [[beans-factory-scopes-other]]
 == Request, Session, Application, and WebSocket Scopes
 
-The `request`, `session`, `application`, and `websocket` scopes are available only
-if you use a web-aware Spring `ApplicationContext` implementation (such as
-`XmlWebApplicationContext`). If you use these scopes with regular Spring IoC containers,
-such as the `ClassPathXmlApplicationContext`, an `IllegalStateException` that complains
-about an unknown bean scope is thrown.
-
+`request`, `session`, `application`, 그리고 `websocket` 범위(scope)는 웹 인식형 스프링 `ApplicationContext` 구현(예: `XmlWebApplicationContext`)을 사용하는 경우에만 사용할 수 있습니다. 일반적인 Spring IoC 컨테이너인 `ClassPathXmlApplicationContext`와 같은 컨테이너에서 이러한 범위를 사용하면 알 수 없는 빈 범위에 관한 `IllegalStateException` 예외가 발생합니다.
 
 
 [[beans-factory-scopes-other-web-configuration]]
 === Initial Web Configuration
 
-To support the scoping of beans at the `request`, `session`, `application`, and
-`websocket` levels (web-scoped beans), some minor initial configuration is
-required before you define your beans. (This initial setup is not required
-for the standard scopes: `singleton` and `prototype`.)
+빈을 `request`, `session`, `application`, 그리고 `websocket` 레벨(web 범위)에서 지원하려면 빈을 정의하기 전에 일부 초기 설정이 필요합니다. (이 초기 설정은 표준 범위인 `singleton`과 `prototype`에는 필요하지 않습니다.)
 
-How you accomplish this initial setup depends on your particular Servlet environment.
+이 초기 설정은 당신의 특정 서블릿 환경에 따라 어떻게 수행하는지에 따라 다릅니다.
 
-If you access scoped beans within Spring Web MVC, in effect, within a request that is
-processed by the Spring `DispatcherServlet`, no special setup is necessary.
-`DispatcherServlet` already exposes all relevant state.
+Spring 웹 MVC 내에서 범위가 지정된 빈에 접근하는 경우, 실제로 Spring `DispatcherServlet`에 의해 처리되는 요청 내에서, 별도의 특별한 설정이 필요하지 않습니다. `DispatcherServlet`은 이미 모든 관련 상태를 노출합니다.
 
-If you use a Servlet web container, with requests processed outside of Spring's
-`DispatcherServlet` (for example, when using JSF), you need to register the
-`org.springframework.web.context.request.RequestContextListener` `ServletRequestListener`.
-This can be done programmatically by using the `WebApplicationInitializer` interface.
-Alternatively, add the following declaration to your web application's `web.xml` file:
+만약 Spring의 `DispatcherServlet` 이외의 방법으로 처리되는 요청(예: JSF를 사용할 때)이 있는 Servlet 웹 컨테이너를 사용하는 경우, `org.springframework.web.context.request.RequestContextListener` `ServletRequestListener`를 등록해야 합니다. 이는 `WebApplicationInitializer` 인터페이스를 사용하여 프로그래밍적으로 수행할 수도 있습니다. 또는 웹 애플리케이션의 `web.xml` 파일에 다음 선언을 추가할 수도 있습니다:
 
 [source,xml,indent=0,subs="verbatim,quotes"]
 ----
@@ -160,10 +123,8 @@ Alternatively, add the following declaration to your web application's `web.xml`
 	</web-app>
 ----
 
-Alternatively, if there are issues with your listener setup, consider using Spring's
-`RequestContextFilter`. The filter mapping depends on the surrounding web
-application configuration, so you have to change it as appropriate. The following listing
-shows the filter part of a web application:
+대안으로, 리스너 설정에 문제가 있는 경우 Spring의 `RequestContextFilter`를 사용하는 것을 고려할 수 있습니다. 
+필터 매핑은 주변 웹 애플리케이션 구성에 따라 달라지므로 필요에 맞게 변경해야 합니다. 다음 예제는 웹 애플리케이션의 필터 부분을 보여줍니다.:
 
 [source,xml,indent=0,subs="verbatim,quotes"]
 ----
@@ -181,10 +142,7 @@ shows the filter part of a web application:
 	</web-app>
 ----
 
-`DispatcherServlet`, `RequestContextListener`, and `RequestContextFilter` all do exactly
-the same thing, namely bind the HTTP request object to the `Thread` that is servicing
-that request. This makes beans that are request- and session-scoped available further
-down the call chain.
+`DispatcherServlet`, `RequestContextListener`, 그리고 `RequestContextFilter`는 모두 동일한 작업을 수행합니다. 즉, HTTP 요청 객체를 해당 요청을 처리하는 `Thread`에 바인딩합니다. 이렇게 하면 요청과 세션 범위의 빈이 호출 체인 아래에서 사용 가능해집니다.
 
 
 
@@ -198,17 +156,10 @@ Consider the following XML configuration for a bean definition:
 	<bean id="loginAction" class="com.something.LoginAction" scope="request"/>
 ----
 
-The Spring container creates a new instance of the `LoginAction` bean by using the
-`loginAction` bean definition for each and every HTTP request. That is, the
-`loginAction` bean is scoped at the HTTP request level. You can change the internal
-state of the instance that is created as much as you want, because other instances
-created from the same `loginAction` bean definition do not see these changes in state.
-They are particular to an individual request. When the request completes processing, the
-bean that is scoped to the request is discarded.
+Spring 컨테이너는 각 HTTP 요청에 대해 `loginAction` 빈 정의를 사용하여 `LoginAction` 빈의 새 인스턴스를 생성합니다. 즉, `loginAction` 빈은 HTTP 요청 범위(scope)에 있습니다. 이로 인해 생성된 인스턴스의 내부 상태를 원하는대로 변경할 수 있으며, 동일한 `loginAction` 빈 정의에서 생성된 다른 인스턴스는 상태 변경을 보지 못합니다. 이러한 상태 변경은 개별 요청에 특정합니다. 요청 처리가 완료되면 요청 범위로 지정된 빈은 폐기됩니다.
 
-When using annotation-driven components or Java configuration, the `@RequestScope` annotation
-can be used to assign a component to the `request` scope. The following example shows how
-to do so:
+어노테이션 기반 컴포넌트나 자바 구성을 사용할 때 `@RequestScope` 어노테이션을 사용하여 컴포넌트를 `request` 범위로 할당할 수 있습니다.
+다음 예제에서는 어떻게 할 수 있는지 보여줍니다:
 
 [tabs]
 ======
@@ -247,18 +198,9 @@ Consider the following XML configuration for a bean definition:
 	<bean id="userPreferences" class="com.something.UserPreferences" scope="session"/>
 ----
 
-The Spring container creates a new instance of the `UserPreferences` bean by using the
-`userPreferences` bean definition for the lifetime of a single HTTP `Session`. In other
-words, the `userPreferences` bean is effectively scoped at the HTTP `Session` level. As
-with request-scoped beans, you can change the internal state of the instance that is
-created as much as you want, knowing that other HTTP `Session` instances that are also
-using instances created from the same `userPreferences` bean definition do not see these
-changes in state, because they are particular to an individual HTTP `Session`. When the
-HTTP `Session` is eventually discarded, the bean that is scoped to that particular HTTP
-`Session` is also discarded.
+Spring 컨테이너는 HTTP `Session` 수명 동안 `userPreferences` 빈 정의를 사용하여 `UserPreferences` 빈의 새 인스턴스를 생성합니다. 다시 말해, `userPreferences` 빈은 사실상 HTTP `Session` 범위(scope)에 있습니다. 요청 범위 빈과 마찬가지로 생성된 인스턴스의 내부 상태를 원하는대로 변경할 수 있으며, 동일한 `userPreferences` 빈 정의에서 생성된 다른 HTTP `Session` 인스턴스가 이러한 상태 변경을 보지 못하므로 이러한 변경은 개별 HTTP `Session`에 특정합니다. HTTP `Session`이 최종적으로 폐기될 때 해당 HTTP `Session` 범위로 지정된 빈도 폐기됩니다.
 
-When using annotation-driven components or Java configuration, you can use the
-`@SessionScope` annotation to assign a component to the `session` scope.
+어노테이션 기반 컴포넌트나 자바 구성을 사용할 때 `@SessionScope` 어노테이션을 사용하여 컴포넌트를 `session` 범위로 할당할 수 있습니다.
 
 [tabs]
 ======
@@ -298,17 +240,9 @@ Consider the following XML configuration for a bean definition:
 	<bean id="appPreferences" class="com.something.AppPreferences" scope="application"/>
 ----
 
-The Spring container creates a new instance of the `AppPreferences` bean by using the
-`appPreferences` bean definition once for the entire web application. That is, the
-`appPreferences` bean is scoped at the `ServletContext` level and stored as a regular
-`ServletContext` attribute. This is somewhat similar to a Spring singleton bean but
-differs in two important ways: It is a singleton per `ServletContext`, not per Spring
-`ApplicationContext` (for which there may be several in any given web application),
-and it is actually exposed and therefore visible as a `ServletContext` attribute.
+Spring 컨테이너는 `appPreferences` 빈 정의를 사용하여 `AppPreferences` 빈의 새 인스턴스를 웹 애플리케이션 전체에 대해 한 번만 생성합니다. 즉, `appPreferences` 빈은 `ServletContext` 범위(scope)에 있으며 일반적인 `ServletContext` 속성으로 저장됩니다. 이는 Spring의 싱글톤 빈과 다소 유사하지만 두 가지 중요한 차이점이 있습니다. 이것은 Spring `ApplicationContext` 당 하나가 아니라 `ServletContext` 당 하나의 싱글톤이며 (한 웹 애플리케이션에서 여러 개가 있을 수 있음), 실제로 `ServletContext` 속성으로 노출되어 볼 수 있습니다.
 
-When using annotation-driven components or Java configuration, you can use the
-`@ApplicationScope` annotation to assign a component to the `application` scope. The
-following example shows how to do so:
+어노테이션 기반 컴포넌트나 자바 구성을 사용할 때 `@ApplicationScope` 어노테이션을 사용하여 컴포넌트를 `application` 범위로 할당할 수 있습니다. 다음 예제에서는 어떻게 할 수 있는지 보여줍니다:
 
 [tabs]
 ======
@@ -341,46 +275,25 @@ Kotlin::
 [[beans-factory-scopes-websocket]]
 === WebSocket Scope
 
-WebSocket scope is associated with the lifecycle of a WebSocket session and applies to
-STOMP over WebSocket applications, see
-xref:web/websocket/stomp/scope.adoc[WebSocket scope] for more details.
-
-
+WebSocket 범위(scope)는 WebSocket 세션의 라이프사이클에 관련이 있으며, WebSocket을 통한 STOMP(Streaming Text Oriented Messaging Protocol) 애플리케이션에 적용됩니다. 자세한 내용은 [WebSocket 범위(WebSocket scope)](xref:web/websocket/stomp/scope.adoc)를 참조하세요.
 
 
 [[beans-factory-scopes-other-injection]]
 === Scoped Beans as Dependencies
 
-The Spring IoC container manages not only the instantiation of your objects (beans),
-but also the wiring up of collaborators (or dependencies). If you want to inject (for
-example) an HTTP request-scoped bean into another bean of a longer-lived scope, you may
-choose to inject an AOP proxy in place of the scoped bean. That is, you need to inject
-a proxy object that exposes the same public interface as the scoped object but that can
-also retrieve the real target object from the relevant scope (such as an HTTP request)
-and delegate method calls onto the real object.
+Spring IoC 컨테이너는 객체(빈)의 인스턴스화 뿐만 아니라 협업자(또는 의존성)의 연결(wiring)도 관리합니다. 예를 들어 HTTP 요청 범위 빈을 수명이 더 긴 범위의 다른 빈에 주입하려면 해당 범위 빈 대신 AOP(Aspect-Oriented Programming) 프록시를 주입할 수 있습니다. 즉, 범위 빈과 동일한 공개 인터페이스를 노출하지만 관련 범위(예: HTTP 요청)에서 실제 대상 객체를 검색하고 실제 객체로 메서드 호출을 위임할 수 있는 프록시 객체를 주입해야 합니다.
 
 [NOTE]
 ====
-You may also use `<aop:scoped-proxy/>` between beans that are scoped as `singleton`,
-with the reference then going through an intermediate proxy that is serializable
-and therefore able to re-obtain the target singleton bean on deserialization.
+`<aop:scoped-proxy/>`를 사용하여 `singleton` 범위로 지정된 빈 간에도 중간 프록시를 통과하도록 할 수 있습니다. 이렇게 하면 참조가 직렬화 가능하며 따라서 역직렬화 시에 대상 싱글톤 빈을 다시 얻을 수 있습니다.
 
-When declaring `<aop:scoped-proxy/>` against a bean of scope `prototype`, every method
-call on the shared proxy leads to the creation of a new target instance to which the
-call is then being forwarded.
+또한 범위가 `prototype`로 지정된 빈에 대한 `<aop:scoped-proxy/>`를 선언하면 공유 프록시를 통한 모든 메서드 호출이 호출이 전달될 새 대상 인스턴스의 생성으로 이어집니다.
 
-Also, scoped proxies are not the only way to access beans from shorter scopes in a
-lifecycle-safe fashion. You may also declare your injection point (that is, the
-constructor or setter argument or autowired field) as `ObjectFactory<MyTargetBean>`,
-allowing for a `getObject()` call to retrieve the current instance on demand every
-time it is needed -- without holding on to the instance or storing it separately.
+또한 범위가 짧은 범위에서 빈에 안전하게 액세스하는 방법으로 scoped 프록시가 있는 것이 아닙니다. 주입 지점(즉, 생성자 또는 setter 인자 또는 자동 주입 필드)을 `ObjectFactory<MyTargetBean>`로 선언할 수도 있으며, 이렇게 하면 필요할 때마다 현재 인스턴스를 검색하는 `getObject()` 호출이 가능합니다. 이렇게 하면 인스턴스를 보유하거나 별도로 저장하지 않고도 필요한 때마다 인스턴스를 얻을 수 있습니다.
 
-As an extended variant, you may declare `ObjectProvider<MyTargetBean>` which delivers
-several additional access variants, including `getIfAvailable` and `getIfUnique`.
+확장된 변형으로 `ObjectProvider<MyTargetBean>`를 선언할 수도 있으며, 이를 통해 `getIfAvailable` 및 `getIfUnique`를 포함한 여러 가지 추가 액세스 옵션을 제공할 수 있습니다.
 
-The JSR-330 variant of this is called `Provider` and is used with a `Provider<MyTargetBean>`
-declaration and a corresponding `get()` call for every retrieval attempt.
-See xref:core/beans/standard-annotations.adoc[here] for more details on JSR-330 overall.
+이와 관련된 JSR-330 변형은 `Provider`라고 불리며, `Provider<MyTargetBean>` 선언 및 해당 검색 시도마다 `get()` 호출과 함께 사용됩니다. JSR-330에 대한 자세한 내용은 [여기](xref:core/beans/standard-annotations.adoc)에서 확인할 수 있습니다.
 ====
 
 The configuration in the following example is only one line, but it is important to
@@ -412,16 +325,10 @@ understand the "`why`" as well as the "`how`" behind it:
 ----
 <1> The line that defines the proxy.
 
-To create such a proxy, you insert a child `<aop:scoped-proxy/>` element into a
-scoped bean definition (see
-xref:core/beans/factory-scopes.adoc#beans-factory-scopes-other-injection-proxies[Choosing the Type of Proxy to Create]
-and xref:core/appendix/xsd-schemas.adoc[XML Schema-based configuration]).
+이러한 프록시를 생성하려면 범위가 지정된 빈 정의에 자식 `<aop:scoped-proxy/>` 요소를 삽입합니다. (자세한 내용은 [프록시 유형 선택](xref:core/beans/factory-scopes.adoc#beans-factory-scopes-other-injection-proxies) 및 [XML 스키마 기반 구성](xref:core/appendix/xsd-schemas.adoc)을 참조하세요.)
 
-Why do definitions of beans scoped at the `request`, `session` and custom-scope
-levels require the `<aop:scoped-proxy/>` element in common scenarios?
-Consider the following singleton bean definition and contrast it with
-what you need to define for the aforementioned scopes (note that the following
-`userPreferences` bean definition as it stands is incomplete):
+왜 `request`, `session`, 그리고 사용자 정의 스코프 수준에서 범위가 지정된 빈의 정의가 공통 시나리오에서 `<aop:scoped-proxy/>` 요소를 필요로 할까요?
+다음 싱글톤 빈 정의를 고려하고 이것을 이전에 언급한 스코프에 대한 정의와 비교해 보겠습니다. (다음 `userPreferences` 빈 정의는 현재 불완전한 상태입니다.):
 
 [source,xml,indent=0,subs="verbatim,quotes"]
 ----
@@ -432,31 +339,11 @@ what you need to define for the aforementioned scopes (note that the following
 	</bean>
 ----
 
-In the preceding example, the singleton bean (`userManager`) is injected with a reference
-to the HTTP `Session`-scoped bean (`userPreferences`). The salient point here is that the
-`userManager` bean is a singleton: it is instantiated exactly once per
-container, and its dependencies (in this case only one, the `userPreferences` bean) are
-also injected only once. This means that the `userManager` bean operates only on the
-exact same `userPreferences` object (that is, the one with which it was originally injected).
+앞의 예에서 싱글톤 빈(`userManager`)은 HTTP `Session` 범위의 빈(`userPreferences`)에 대한 참조를 주입받습니다. 여기서 중요한 점은 `userManager` 빈이 싱글톤인데, 이는 컨테이너 당 한 번만 인스턴스화되며 그 종속성(이 경우에는 `userPreferences` 빈 하나만)도 한 번만 주입됩니다. 이는 `userManager` 빈이 처음 주입된 `userPreferences` 객체와 정확히 동일한 객체(즉, 처음 주입된 객체)에서만 작동한다는 것을 의미합니다.
 
-This is not the behavior you want when injecting a shorter-lived scoped bean into a
-longer-lived scoped bean (for example, injecting an HTTP `Session`-scoped collaborating
-bean as a dependency into singleton bean). Rather, you need a single `userManager`
-object, and, for the lifetime of an HTTP `Session`, you need a `userPreferences` object
-that is specific to the HTTP `Session`. Thus, the container creates an object that
-exposes the exact same public interface as the `UserPreferences` class (ideally an
-object that is a `UserPreferences` instance), which can fetch the real
-`UserPreferences` object from the scoping mechanism (HTTP request, `Session`, and so
-forth). The container injects this proxy object into the `userManager` bean, which is
-unaware that this `UserPreferences` reference is a proxy. In this example, when a
-`UserManager` instance invokes a method on the dependency-injected `UserPreferences`
-object, it is actually invoking a method on the proxy. The proxy then fetches the real
-`UserPreferences` object from (in this case) the HTTP `Session` and delegates the
-method invocation onto the retrieved real `UserPreferences` object.
+이것은 짧은 수명의 스코프 빈을 더 긴 수명의 스코프 빈에 주입할 때 원하는 동작이 아닙니다(예: HTTP `Session` 범위의 협업 빈을 싱글톤 빈의 종속성으로 주입). 대신에 하나의 `userManager` 객체가 필요하며 HTTP `Session`의 수명 동안 HTTP `Session`에 특정한 `userPreferences` 객체가 필요합니다. 따라서 컨테이너는 `UserPreferences` 클래스와 정확히 동일한 공개 인터페이스를 노출하는 객체(이상적으로 `UserPreferences` 인스턴스인 객체)를 생성하고, 이 객체는 스코핑 메커니즘(HTTP 요청, `Session` 등)에서 실제 `UserPreferences` 객체를 가져올 수 있어야 합니다. 컨테이너는 이 프록시 객체를 `userManager` 빈에 주입하며, 이 `UserPreferences` 참조가 프록시임을 알지 못합니다. 이 예에서 `UserManager` 인스턴스가 종속성 주입된 `UserPreferences` 객체에서 메서드를 호출할 때 실제로는 프록시에서 메서드를 호출합니다. 프록시는 그런 다음 (이 경우에는) HTTP `Session`에서 실제 `UserPreferences` 객체를 가져와서 메서드 호출을 검색한 실제 `UserPreferences` 객체로 위임합니다.
 
-Thus, you need the following (correct and complete) configuration when injecting
-`request-` and `session-scoped` beans into collaborating objects, as the following example
-shows:
+따라서 협업 객체에 `request-` 및 `session-scoped` 빈을 주입할 때 다음과 같은 (올바르고 완전한) 구성이 필요합니다. 다음 예제에서 보여드립니다:
 
 [source,xml,indent=0,subs="verbatim,quotes"]
 ----
@@ -477,18 +364,10 @@ the `<aop:scoped-proxy/>` element, a CGLIB-based class proxy is created.
 
 [NOTE]
 ====
-CGLIB proxies do not intercept private methods. Attempting to call a private method
-on such a proxy will not delegate to the actual scoped target object.
+CGLIB 프록시는 private 메서드를 가로채지 않습니다. 이러한 프록시에서 private 메서드를 호출하려고 시도하면 실제 범위 대상 객체로 위임되지 않습니다.
 ====
 
-Alternatively, you can configure the Spring container to create standard JDK
-interface-based proxies for such scoped beans, by specifying `false` for the value of
-the `proxy-target-class` attribute of the `<aop:scoped-proxy/>` element. Using JDK
-interface-based proxies means that you do not need additional libraries in your
-application classpath to affect such proxying. However, it also means that the class of
-the scoped bean must implement at least one interface and that all collaborators
-into which the scoped bean is injected must reference the bean through one of its
-interfaces. The following example shows a proxy based on an interface:
+대안으로 Spring 컨테이너를 구성하여 해당 범위 빈에 대한 표준 JDK 인터페이스 기반 프록시를 생성하도록 할 수 있습니다. 이를 위해 `<aop:scoped-proxy/>` 요소의 `proxy-target-class` 속성 값을 `false`로 설정합니다. JDK 인터페이스 기반 프록시를 사용하면 이러한 프록시를 적용하기 위해 애플리케이션 클래스 경로에 추가 라이브러리가 필요하지 않습니다. 그러나 이것은 해당 범위 빈의 클래스가 적어도 하나의 인터페이스를 구현해야 하고, 해당 범위 빈이 주입되는 모든 협업자는 해당 인터페이스 중 하나를 통해 빈에 참조해야 함을 의미합니다. 다음 예제에서는 인터페이스를 기반으로 한 프록시를 보여줍니다:
 
 [source,xml,indent=0,subs="verbatim,quotes"]
 ----
@@ -510,28 +389,17 @@ see xref:core/aop/proxying.adoc[Proxying Mechanisms].
 [[beans-factory-scopes-custom]]
 == Custom Scopes
 
-The bean scoping mechanism is extensible. You can define your own
-scopes or even redefine existing scopes, although the latter is considered bad practice
-and you cannot override the built-in `singleton` and `prototype` scopes.
+빈 범위 메커니즘은 확장 가능합니다. 자신만의 범위를 정의하거나 기존 범위를 다시 정의할 수 있지만, 후자는 권장되지 않는 관행으로 간주되며 내장된 `singleton` 및 `prototype` 범위를 재정의할 수는 없습니다.
 
 
 [[beans-factory-scopes-custom-creating]]
 === Creating a Custom Scope
 
-To integrate your custom scopes into the Spring container, you need to implement the
-`org.springframework.beans.factory.config.Scope` interface, which is described in this
-section. For an idea of how to implement your own scopes, see the `Scope`
-implementations that are supplied with the Spring Framework itself and the
-{spring-framework-api}/beans/factory/config/Scope.html[`Scope`] javadoc,
-which explains the methods you need to implement in more detail.
+Spring 컨테이너에 사용자 정의 범위를 통합하려면 이 섹션에서 설명하는 `org.springframework.beans.factory.config.Scope` 인터페이스를 구현해야 합니다. 자신만의 범위를 구현하는 방법에 대한 아이디어는 Spring Framework 자체와 함께 제공되는 `Scope` 구현 및 `{spring-framework-api}/beans/factory/config/Scope.html[`Scope`]` 자바독을 참조하면 됩니다. 이 자바독에서는 더 자세히 구현해야 하는 메서드에 대한 설명이 포함되어 있습니다.
 
-The `Scope` interface has four methods to get objects from the scope, remove them from
-the scope, and let them be destroyed.
+`Scope` 인터페이스에는 범위에서 객체를 가져오고 범위에서 제거하며 객체를 파괴하는 네 가지 메서드가 있습니다.
 
-The session scope implementation, for example, returns the session-scoped bean (if it
-does not exist, the method returns a new instance of the bean, after having bound it to
-the session for future reference). The following method returns the object from the
-underlying scope:
+예를 들어 세션 범위 구현은 세션 범위의 빈을 반환합니다(빈이 존재하지 않으면 미래 참조를 위해 세션에 빈을 바인딩한 후 새 인스턴스를 반환합니다). 다음 메서드는 기본 범위에서 객체를 반환합니다:
 
 [tabs]
 ======
@@ -550,10 +418,7 @@ Kotlin::
 ----
 ======
 
-The session scope implementation, for example, removes the session-scoped bean from the
-underlying session. The object should be returned, but you can return `null` if the
-object with the specified name is not found. The following method removes the object from
-the underlying scope:
+세션 범위 구현은 세션 범위의 빈을 기본 세션에서 제거합니다. 객체를 반환해야 하지만 지정된 이름의 객체를 찾을 수 없는 경우 `null`을 반환할 수 있습니다. 다음 메서드는 기본 범위에서 객체를 제거합니다.:
 
 [tabs]
 ======
@@ -622,9 +487,7 @@ identifier can be the session identifier.
 [[beans-factory-scopes-custom-using]]
 === Using a Custom Scope
 
-After you write and test one or more custom `Scope` implementations, you need to make
-the Spring container aware of your new scopes. The following method is the central
-method to register a new `Scope` with the Spring container:
+하나 이상의 사용자 정의 `Scope` 구현을 작성하고 테스트한 후에는 Spring 컨테이너가 새로운 스코프를 인식하도록 설정해야 합니다. 다음 메서드는 Spring 컨테이너에 새로운 `Scope`를 등록하는 중요한 메서드입니다.:
 
 [tabs]
 ======
@@ -643,21 +506,13 @@ Kotlin::
 ----
 ======
 
-This method is declared on the `ConfigurableBeanFactory` interface, which is available
-through the `BeanFactory` property on most of the concrete `ApplicationContext`
-implementations that ship with Spring.
+이 메서드는 대부분의 Spring과 함께 제공되는 구체적인 `ApplicationContext` 구현체에서 제공되는 `BeanFactory` 속성을 통해 사용할 수 있는 `ConfigurableBeanFactory` 인터페이스에 선언되어 있습니다.
 
-The first argument to the `registerScope(..)` method is the unique name associated with
-a scope. Examples of such names in the Spring container itself are `singleton` and
-`prototype`. The second argument to the `registerScope(..)` method is an actual instance
-of the custom `Scope` implementation that you wish to register and use.
+`registerScope(..)` 메서드의 첫 번째 인수는 스코프와 연결된 고유한 이름입니다. Spring 컨테이너 내에서 이와 같은 이름의 예시는 `singleton` 및 `prototype`입니다. `registerScope(..)` 메서드의 두 번째 인수는 등록하고 사용하려는 사용자 정의 `Scope` 구현의 실제 인스턴스입니다.
 
-Suppose that you write your custom `Scope` implementation, and then register it as shown
-in the next example.
+사용자 정의 `Scope` 구현을 작성하고 다음 예제에 표시된대로 등록한다고 가정해 보겠습니다.
 
-NOTE: The next example uses `SimpleThreadScope`, which is included with Spring but is not
-registered by default. The instructions would be the same for your own custom `Scope`
-implementations.
+NOTE: 다음 예제에서는 Spring과 함께 제공되지만 기본적으로 등록되지 않는 `SimpleThreadScope`를 사용합니다. 동일한 지침은 사용자 정의 `Scope` 구현에 대해서도 적용됩니다.
 
 [tabs]
 ======
@@ -686,9 +541,8 @@ You can then create bean definitions that adhere to the scoping rules of your cu
 	<bean id="..." class="..." scope="thread">
 ----
 
-With a custom `Scope` implementation, you are not limited to programmatic registration
-of the scope. You can also do the `Scope` registration declaratively, by using the
-`CustomScopeConfigurer` class, as the following example shows:
+
+사용자 정의 Scope 구현으로는 스코프의 프로그래밍 등록에만 국한되지 않습니다. CustomScopeConfigurer 클래스를 사용하여 스코프 등록을 선언적으로 수행할 수도 있습니다. 다음 예제에서처럼요:
 
 [source,xml,indent=0,subs="verbatim,quotes"]
 ----
@@ -723,9 +577,7 @@ of the scope. You can also do the `Scope` registration declaratively, by using t
 	</beans>
 ----
 
-NOTE: When you place `<aop:scoped-proxy/>` within a `<bean>` declaration for a
-`FactoryBean` implementation, it is the factory bean itself that is scoped, not the object
-returned from `getObject()`.
+NOTE: `<aop:scoped-proxy/>`를 `FactoryBean` 구현체의 `<bean>` 선언 내에 배치할 경우, 스코프가 반환된 `getObject()`에서가 아니라 팩토리 빈 자체에 적용됩니다..
 
 
 
