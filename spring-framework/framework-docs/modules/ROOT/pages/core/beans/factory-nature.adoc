@@ -1,8 +1,8 @@
 [[beans-factory-nature]]
 = Customizing the Nature of a Bean
 
-The Spring Framework provides a number of interfaces you can use to customize the nature
-of a bean. This section groups them as follows:
+Spring Framework는 빈의 특성을 사용자 정의할 수 있는 여러 인터페이스를 제공합니다. 
+이 섹션에서는 이러한 인터페이스를 다음과 같이 그룹화합니다.:
 
 * xref:core/beans/factory-nature.adoc#beans-factory-lifecycle[Lifecycle Callbacks]
 * xref:core/beans/factory-nature.adoc#beans-factory-aware[`ApplicationContextAware` and `BeanNameAware`]
