@@ -13,33 +13,21 @@ Spring Framework는 빈의 특성을 사용자 정의할 수 있는 여러 인�
 [[beans-factory-lifecycle]]
 == Lifecycle Callbacks
 
-To interact with the container's management of the bean lifecycle, you can implement
-the Spring `InitializingBean` and `DisposableBean` interfaces. The container calls
-`afterPropertiesSet()` for the former and `destroy()` for the latter to let the bean
-perform certain actions upon initialization and destruction of your beans.
+빈의 라이프사이클을 컨테이너와 상호작용하려면 Spring의 `InitializingBean` 및 `DisposableBean` 인터페이스를 구현할 수 있습니다. 
+컨테이너는 빈의 초기화 및 소멸 시 특정 작업을 수행하도록 빈의 초기화 시 `afterPropertiesSet()` 메서드를, 소멸 시 `destroy()` 메서드를 호출합니다.
 
 [TIP]
 ====
-The JSR-250 `@PostConstruct` and `@PreDestroy` annotations are generally considered best
-practice for receiving lifecycle callbacks in a modern Spring application. Using these
-annotations means that your beans are not coupled to Spring-specific interfaces.
-For details, see xref:core/beans/annotation-config/postconstruct-and-predestroy-annotations.adoc[Using `@PostConstruct` and `@PreDestroy`].
+JSR-250의 `@PostConstruct` 및 `@PreDestroy` 어노테이션은 현대적인 Spring 애플리케이션에서 라이프사이클 콜백을 받는 가장 좋은 방법으로 일반적으로 간주됩니다. 이러한 어노테이션을 사용하면 빈이 Spring 특정 인터페이스에 결합되지 않습니다. 자세한 내용은 `@PostConstruct` 및 `@PreDestroy` 사용 문서를 참조하십시오.
 
-If you do not want to use the JSR-250 annotations but you still want to remove
-coupling, consider `init-method` and `destroy-method` bean definition metadata.
+JSR-250 어노테이션을 사용하지 않지만 여전히 결합을 제거하려면 `init-method` 및 `destroy-method` 빈 정의 메타데이터를 고려할 수 있습니다.
 ====
 
-Internally, the Spring Framework uses `BeanPostProcessor` implementations to process any
-callback interfaces it can find and call the appropriate methods. If you need custom
-features or other lifecycle behavior Spring does not by default offer, you can
-implement a `BeanPostProcessor` yourself. For more information, see
-xref:core/beans/factory-extension.adoc[Container Extension Points].
+내부적으로 Spring Framework는 콜백 인터페이스를 처리하고 적절한 메서드를 호출하기 위해 `BeanPostProcessor` 구현을 사용합니다. Spring이 기본적으로 제공하지 않는 사용자 정의 기능이나 다른 라이프사이클 동작이 필요한 경우 직접 `BeanPostProcessor`를 구현할 수 있습니다. 자세한 내용은 "Container Extension Points"를 참조하십시오.
 
-In addition to the initialization and destruction callbacks, Spring-managed objects may
-also implement the `Lifecycle` interface so that those objects can participate in the
-startup and shutdown process, as driven by the container's own lifecycle.
+또한 초기화 및 소멸 콜백 외에도 Spring이 관리하는 객체는 컨테이너의 자체 라이프사이클에 의해 주도되는 시작 및 종료 프로세스에 참여할 수 있도록 객체가 `Lifecycle` 인터페이스를 구현할 수 있습니다.
 
-The lifecycle callback interfaces are described in this section.
+라이프사이클 콜백 인터페이스에 대한 자세한 내용은 이 섹션에서 설명됩니다.
 
 
 
