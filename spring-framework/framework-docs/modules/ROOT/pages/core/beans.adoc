@@ -3,6 +3,7 @@
 :page-section-summary-toc: 1
 
 이 장은 스프링의 제어의 역전 (IoC) 컨테이너에 대해 다룹니다.
+
 ---
 This chapter covers Spring's Inversion of Control (IoC) container.
 
