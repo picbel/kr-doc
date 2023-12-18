@@ -9,7 +9,6 @@ Spring Framework는 빈의 특성을 사용자 정의할 수 있는 여러 인�
 * xref:core/beans/factory-nature.adoc#aware-list[Other `Aware` Interfaces]
 
 
-
 [[beans-factory-lifecycle]]
 == Lifecycle Callbacks
 
