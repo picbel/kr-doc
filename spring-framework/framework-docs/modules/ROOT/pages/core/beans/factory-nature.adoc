@@ -74,8 +74,7 @@ Kotlin::
 ----
 ======
 
-The preceding example has almost exactly the same effect as the following example
-(which consists of two listings):
+앞의 예제는 다음 예제와 거의 동일한 효과를 가집니다 (두 개의 목록으로 구성됨):
 
 [source,xml,indent=0,subs="verbatim,quotes"]
 ----
@@ -114,25 +113,11 @@ However, the first of the two preceding examples does not couple the code to Spr
 
 [NOTE]
 ====
-Be aware that `@PostConstruct` and initialization methods in general are executed
-within the container's singleton creation lock. The bean instance is only considered
-as fully initialized and ready to be published to others after returning from the
-`@PostConstruct` method. Such individual initialization methods are only meant
-for validating the configuration state and possibly preparing some data structures
-based on the given configuration but no further activity with external bean access.
-Otherwise there is a risk for an initialization deadlock.
+`@PostConstruct` 및 일반적인 초기화 메서드는 컨테이너의 싱글톤 생성 락 내에서 실행된다는 점을 유의해야 합니다. `@PostConstruct` 메서드에서 반환한 후에만 빈 인스턴스가 완전히 초기화되었으며 다른 빈에게 공개할 준비가 된 것으로 간주됩니다. 이러한 개별 초기화 메서드는 구성 상태를 유효성 검사하고 주어진 구성을 기반으로 일부 데이터 구조를 준비하는 것을 목적으로 하지만 외부 빈 액세스와 관련된 추가 활동은 수행하지 않아야 합니다. 그렇지 않으면 초기화 데드락이 발생할 수 있습니다.
 
-For a scenario where expensive post-initialization activity is to be triggered,
-e.g. asynchronous database preparation steps, your bean should either implement
-`SmartInitializingSingleton.afterSingletonsInstantiated()` or rely on the context
-refresh event: implementing `ApplicationListener<ContextRefreshedEvent>` or
-declaring its annotation equivalent `@EventListener(ContextRefreshedEvent.class)`.
-Those variants come after all regular singleton initialization and therefore
-outside of any singleton creation lock.
+비용이 많이 드는 후 초기화 활동이 트리거될 시나리오의 경우 (예: 비동기 데이터베이스 준비 단계), 빈은 `SmartInitializingSingleton.afterSingletonsInstantiated()`를 구현하거나 컨텍스트 리프레시 이벤트를 활용해야 합니다. 즉, `ApplicationListener<ContextRefreshedEvent>`를 구현하거나 해당 어노테이션 등가인 `@EventListener(ContextRefreshedEvent.class)`을 선언해야 합니다. 이러한 변형은 모든 일반 싱글톤 초기화 이후에 나타나므로 싱글톤 생성 락 외부에서 실행됩니다.
 
-Alternatively, you may implement the `(Smart)Lifecycle` interface and integrate with
-the container's overall lifecycle management, including an auto-startup mechanism,
-a pre-destroy stop step, and potential stop/restart callbacks (see below).
+또는 `(Smart)Lifecycle` 인터페이스를 구현하고 컨테이너의 전체 라이프사이클 관리와 통합할 수 있으며, 자동 시작 메커니즘, 사전 소멸 정지 단계 및 잠재적인 정지/재시작 콜백도 포함됩니다.
 ====
 
 
