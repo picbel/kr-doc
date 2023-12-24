@@ -125,22 +125,14 @@ However, the first of the two preceding examples does not couple the code to Spr
 [[beans-factory-lifecycle-disposablebean]]
 === Destruction Callbacks
 
-Implementing the `org.springframework.beans.factory.DisposableBean` interface lets a
-bean get a callback when the container that contains it is destroyed. The
-`DisposableBean` interface specifies a single method:
+`org.springframework.beans.factory.DisposableBean` 인터페이스를 구현하면, 해당 빈이 포함된 컨테이너가 파괴될 때 콜백을 받을 수 있습니다. `DisposableBean` 인터페이스는 단 하나의 메소드를 명시합니다:
 
 [source,java,indent=0,subs="verbatim,quotes"]
 ----
 	void destroy() throws Exception;
 ----
 
-We recommend that you do not use the `DisposableBean` callback interface, because it
-unnecessarily couples the code to Spring. Alternatively, we suggest using
-the xref:core/beans/annotation-config/postconstruct-and-predestroy-annotations.adoc[`@PreDestroy`] annotation or
-specifying a generic method that is supported by bean definitions. With XML-based
-configuration metadata, you can use the `destroy-method` attribute on the `<bean/>`.
-With Java configuration, you can use the `destroyMethod` attribute of `@Bean`. See
-xref:core/beans/java/bean-annotation.adoc#beans-java-lifecycle-callbacks[Receiving Lifecycle Callbacks]. Consider the following definition:
+우리는 `DisposableBean` 콜백 인터페이스의 사용을 권장하지 않습니다. 이는 코드를 Spring에 불필요하게 결합시키기 때문입니다. 대신, xref:core/beans/annotation-config/postconstruct-and-predestroy-annotations.adoc의 [`@PreDestroy`] 어노테이션을 사용하거나, 빈 정의에서 지원되는 일반적인 메소드를 지정하는 것이 좋습니다. XML 기반 구성 메타데이터를 사용할 경우, `<bean/>`에 `destroy-method` 속성을 사용할 수 있습니다. Java 구성에서는 `@Bean`의 `destroyMethod` 속성을 사용할 수 있습니다. xref:core/beans/java/bean-annotation.adoc#beans-java-lifecycle-callbacks[수명주기 콜백 받기]를 참조하십시오. 다음 정의를 고려해 보세요:
 
 [source,xml,indent=0,subs="verbatim,quotes"]
 ----
@@ -209,26 +201,15 @@ Kotlin::
 ----
 ======
 
-However, the first of the two preceding definitions does not couple the code to Spring.
+그러나 앞서 언급된 두 가지 정의 중 첫 번째 정의는 코드를 Spring에 결합시키지 않습니다.
 
-Note that Spring also supports inference of destroy methods, detecting a public `close` or
-`shutdown` method. This is the default behavior for `@Bean` methods in Java configuration
-classes and automatically matches `java.lang.AutoCloseable` or `java.io.Closeable`
-implementations, not coupling the destruction logic to Spring either.
+Spring은 또한 `close` 또는 `shutdown`이라는 공개 메소드의 파괴 메소드 추론을 지원합니다. 이는 Java 구성 클래스의 `@Bean` 메소드에 대한 기본 행동이며, 자동으로 `java.lang.AutoCloseable` 또는 `java.io.Closeable` 구현을 매치시켜, Spring에 대한 파괴 로직을 결합시키지 않습니다.
 
-TIP: For destroy method inference with XML, you may assign the `destroy-method` attribute
-of a `<bean>` element a special `(inferred)` value, which instructs Spring to automatically
-detect a public `close` or `shutdown` method on the bean class for a specific bean definition.
-You can also set this special `(inferred)` value on the `default-destroy-method` attribute
-of a `<beans>` element to apply this behavior to an entire set of bean definitions (see
-xref:core/beans/factory-nature.adoc#beans-factory-lifecycle-default-init-destroy-methods[Default Initialization and Destroy Methods]).
+팁: XML을 이용한 파괴 메소드 추론에 대해, `<bean>` 요소의 `destroy-method` 속성에 특별한 `(inferred)` 값을 할당할 수 있습니다. 이는 Spring에게 특정 빈 정의에 대해 빈 클래스에서 공개 `close` 또는 `shutdown` 메소드를 자동으로 감지하도록 지시합니다. 또한 이 특별한 `(inferred)` 값을 `<beans>` 요소의 `default-destroy-method` 속성에 설정하여, 이 행동을 일련의 빈 정의 전체에 적용할 수도 있습니다(참조: xref:core/beans/factory-nature.adoc#beans-factory-lifecycle-default-init-destroy-methods[기본 초기화 및 파괴 메소드]).
 
 [NOTE]
 ====
-For extended shutdown phases, you may implement the `Lifecycle` interface and receive
-an early stop signal before the destroy methods of any singleton beans are called.
-You may also implement `SmartLifecycle` for a time-bound stop step where the container
-will wait for all such stop processing to complete before moving on to destroy methods.
+확장된 종료 단계에 대해, `Lifecycle` 인터페이스를 구현하고 어떤 싱글톤 빈의 파괴 메소드가 호출되기 전에 조기 중지 신호를 받을 수 있습니다. 또한, `SmartLifecycle`을 구현하여 시간에 구속된 중지 단계를 사용할 수 있습니다. 이 경우, 컨테이너는 모든 중지 처리가 완료될 때까지 기다렸다가 파괴 메소드로 이동합니다.
 ====
 
 
@@ -236,24 +217,11 @@ will wait for all such stop processing to complete before moving on to destroy m
 [[beans-factory-lifecycle-default-init-destroy-methods]]
 === Default Initialization and Destroy Methods
 
-When you write initialization and destroy method callbacks that do not use the
-Spring-specific `InitializingBean` and `DisposableBean` callback interfaces, you
-typically write methods with names such as `init()`, `initialize()`, `dispose()`,
-and so on. Ideally, the names of such lifecycle callback methods are standardized across
-a project so that all developers use the same method names and ensure consistency.
+Spring 특정 `InitializingBean` 및 `DisposableBean` 콜백 인터페이스를 사용하지 않고 초기화 및 파괴 메소드 콜백을 작성할 때, 일반적으로 `init()`, `initialize()`, `dispose()` 등과 같은 이름의 메소드를 작성합니다. 이상적으로는, 이러한 수명주기 콜백 메소드의 이름은 프로젝트 전반에 걸쳐 표준화되어 모든 개발자가 동일한 메소드 이름을 사용하고 일관성을 유지할 수 있습니다.
 
-You can configure the Spring container to "`look`" for named initialization and destroy
-callback method names on every bean. This means that you, as an application developer,
-can write your application classes and use an initialization callback called `init()`,
-without having to configure an `init-method="init"` attribute with each bean definition.
-The Spring IoC container calls that method when the bean is created (and in accordance
-with the standard lifecycle callback contract xref:core/beans/factory-nature.adoc#beans-factory-lifecycle[described previously]).
-This feature also enforces a consistent naming convention for initialization and
-destroy method callbacks.
+Spring 컨테이너를 설정하여 모든 빈에서 명명된 초기화 및 파괴 콜백 메소드 이름을 "`look`" 할 수 있습니다. 이는 응용 프로그램 개발자로서 응용 프로그램 클래스를 작성하고, 각 빈 정의에 `init-method="init"` 속성을 구성하지 않고도 `init()`이라는 초기화 콜백을 사용할 수 있음을 의미합니다. Spring IoC 컨테이너는 빈이 생성될 때(그리고 앞서 설명된 표준 수명주기 콜백 계약 xref:core/beans/factory-nature.adoc#beans-factory-lifecycle에 따라) 해당 메소드를 호출합니다. 이 기능은 또한 초기화 및 파괴 메소드 콜백에 대한 일관된 명명 규칙을 적용합니다.
 
-Suppose that your initialization callback methods are named `init()` and your destroy
-callback methods are named `destroy()`. Your class then resembles the class in the
-following example:
+당신의 초기화 콜백 메소드가 `init()`으로, 파괴 콜백 메소드가 `destroy()`로 명명된다고 가정하면, 당신의 클래스는 다음 예제와 같은 클래스와 유사합니다.:
 
 [tabs]
 ======
@@ -309,70 +277,49 @@ You could then use that class in a bean resembling the following:
 	</beans>
 ----
 
-The presence of the `default-init-method` attribute on the top-level `<beans/>` element
-attribute causes the Spring IoC container to recognize a method called `init` on the bean
-class as the initialization method callback. When a bean is created and assembled, if the
-bean class has such a method, it is invoked at the appropriate time.
+`<beans/>` 요소의 최상위에 `default-init-method` 속성이 존재하면 Spring IoC 컨테이너는 빈 클래스에서 `init`이라는 메소드를 초기화 메소드 콜백으로 인식합니다. 빈이 생성되고 조립될 때, 해당 클래스에 그러한 메소드가 있으면 적절한 시기에 호출됩니다.
 
-You can configure destroy method callbacks similarly (in XML, that is) by using the
-`default-destroy-method` attribute on the top-level `<beans/>` element.
+XML을 사용하여 파괴 메소드 콜백도 유사하게 구성할 수 있습니다. 이는 `<beans/>` 요소의 최상위에 `default-destroy-method` 속성을 사용함으로써 이루어집니다.
 
-Where existing bean classes already have callback methods that are named at variance
-with the convention, you can override the default by specifying (in XML, that is) the
-method name by using the `init-method` and `destroy-method` attributes of the `<bean/>`
-itself.
+기존 빈 클래스에 이미 관례와 다르게 명명된 콜백 메소드가 있는 경우, XML에서 `init-method` 및 `destroy-method` 속성을 사용하여 `<bean/>` 자체에 대해 기본값을 재정의하여 메소드 이름을 지정할 수 있습니다.
 
-The Spring container guarantees that a configured initialization callback is called
-immediately after a bean is supplied with all dependencies. Thus, the initialization
-callback is called on the raw bean reference, which means that AOP interceptors and so
-forth are not yet applied to the bean. A target bean is fully created first and
-then an AOP proxy (for example) with its interceptor chain is applied. If the target
-bean and the proxy are defined separately, your code can even interact with the raw
-target bean, bypassing the proxy. Hence, it would be inconsistent to apply the
-interceptors to the `init` method, because doing so would couple the lifecycle of the
-target bean to its proxy or interceptors and leave strange semantics when your code
-interacts directly with the raw target bean.
+Spring 컨테이너는 구성된 초기화 콜백이 빈이 모든 의존성을 제공받은 직후에 호출되도록 보장합니다. 따라서 초기화 콜백은 원시 빈 참조에 대해 호출되며, 이는 AOP 인터셉터 등이 아직 빈에 적용되지 않았음을 의미합니다. 대상 빈이 먼저 완전히 생성된 다음 AOP 프록시(예를 들어)와 그 인터셉터 체인이 적용됩니다. 대상 빈과 프록시가 별도로 정의된 경우, 코드는 원시 대상 빈과 직접 상호 작용하여 프록시를 우회할 수도 있습니다. 따라서 `init` 메소드에 인터셉터를 적용하는 것은 일관성이 없으며, 대상 빈의 생명주기를 프록시나 인터셉터와 결합시키고 코드가 원시 대상 빈과 직접 상호 작용할 때 이상한 의미를 남깁니다.
 
 
 
 [[beans-factory-lifecycle-combined-effects]]
 === Combining Lifecycle Mechanisms
 
-As of Spring 2.5, you have three options for controlling bean lifecycle behavior:
+Spring 2.5부터 빈의 수명주기 행동을 제어하기 위해 세 가지 옵션을 사용할 수 있습니다:
 
-* The xref:core/beans/factory-nature.adoc#beans-factory-lifecycle-initializingbean[`InitializingBean`] and
-xref:core/beans/factory-nature.adoc#beans-factory-lifecycle-disposablebean[`DisposableBean`] callback interfaces
-* Custom `init()` and `destroy()` methods
-* The xref:core/beans/annotation-config/postconstruct-and-predestroy-annotations.adoc[`@PostConstruct` and `@PreDestroy` annotations]
-. You can combine these mechanisms to control a given bean.
+1. `InitializingBean`과 `DisposableBean` 콜백 인터페이스: 이러한 인터페이스는 `InitializingBean`의 `afterPropertiesSet()` 메소드와 `DisposableBean`의 `destroy()` 메소드를 통해 초기화 및 파괴 콜백을 제공합니다.
 
-NOTE: If multiple lifecycle mechanisms are configured for a bean and each mechanism is
-configured with a different method name, then each configured method is run in the
-order listed after this note. However, if the same method name is configured -- for example,
-`init()` for an initialization method -- for more than one of these lifecycle mechanisms,
-that method is run once, as explained in the
-xref:core/beans/factory-nature.adoc#beans-factory-lifecycle-default-init-destroy-methods[preceding section].
+2. 사용자 정의 `init()` 및 `destroy()` 메소드: 개발자는 이러한 메소드를 직접 정의하여 빈의 초기화 및 파괴 단계에서 호출될 수 있도록 할 수 있습니다.
 
-Multiple lifecycle mechanisms configured for the same bean, with different
-initialization methods, are called as follows:
+3. `@PostConstruct`와 `@PreDestroy` 어노테이션: 이 어노테이션들은 자바 EE 5부터 제공되며, 빈의 생명주기 이벤트에 대한 메소드를 표시하는데 사용됩니다.
 
-. Methods annotated with `@PostConstruct`
-. `afterPropertiesSet()` as defined by the `InitializingBean` callback interface
-. A custom configured `init()` method
+이러한 메커니즘들은 주어진 빈을 제어하기 위해 결합될 수 있습니다.
 
-Destroy methods are called in the same order:
+NOTE: 빈에 대해 여러 수명주기 메커니즘이 구성되고 각 메커니즘이 다른 메소드 이름으로 구성된 경우, 구성된 각 메소드는 이 참고문 아래에 나열된 순서대로 실행됩니다. 그러나 동일한 메소드 이름이 - 예를 들어 초기화 메소드로 `init()` - 여러 수명주기 메커니즘에 대해 구성된 경우, 해당 메소드는 앞서 설명한 섹션인 xref:core/beans/factory-nature.adoc#beans-factory-lifecycle-default-init-destroy-methods에서 설명한 대로 한 번 실행됩니다.
 
-. Methods annotated with `@PreDestroy`
-. `destroy()` as defined by the `DisposableBean` callback interface
-. A custom configured `destroy()` method
+동일한 빈에 대해 다른 초기화 메소드로 구성된 여러 수명주기 메커니즘은 다음 순서로 호출됩니다:
+
+1. `@PostConstruct`로 어노테이션된 메소드
+2. `InitializingBean` 콜백 인터페이스에 의해 정의된 `afterPropertiesSet()`
+3. 사용자 정의 `init()` 메소드
+
+파괴 메소드도 같은 순서로 호출됩니다:
+
+1. `@PreDestroy`로 어노테이션된 메소드
+2. `DisposableBean` 콜백 인터페이스에 의해 정의된 `destroy()`
+3. 사용자 정의 `destroy()` 메소드
 
 
 
 [[beans-factory-lifecycle-processor]]
 === Startup and Shutdown Callbacks
 
-The `Lifecycle` interface defines the essential methods for any object that has its own
-lifecycle requirements (such as starting and stopping some background process):
+`Lifecycle` 인터페이스는 시작 및 중지와 같은 배경 프로세스를 가진 모든 객체의 필수 수명주기 요구 사항에 대한 기본적인 메소드들을 정의합니다:
 
 [source,java,indent=0,subs="verbatim,quotes"]
 ----
@@ -386,11 +333,7 @@ lifecycle requirements (such as starting and stopping some background process):
 	}
 ----
 
-Any Spring-managed object may implement the `Lifecycle` interface. Then, when the
-`ApplicationContext` itself receives start and stop signals (for example, for a stop/restart
-scenario at runtime), it cascades those calls to all `Lifecycle` implementations
-defined within that context. It does this by delegating to a `LifecycleProcessor`, shown
-in the following listing:
+Spring에서 관리하는 어떤 객체도 `Lifecycle` 인터페이스를 구현할 수 있습니다. 그러면 `ApplicationContext` 자체가 시작 및 중지 신호를 받을 때(예를 들어, 런타임에서의 중지/재시작 시나리오에서처럼), 해당 컨텍스트 내에 정의된 모든 `Lifecycle` 구현에 이러한 호출을 전파합니다. 이는 `LifecycleProcessor`에 위임함으로써 이루어지며, 다음 목록에서 보여집니다:
 
 [source,java,indent=0,subs="verbatim,quotes"]
 ----
@@ -402,31 +345,16 @@ in the following listing:
 	}
 ----
 
-Notice that the `LifecycleProcessor` is itself an extension of the `Lifecycle`
-interface. It also adds two other methods for reacting to the context being refreshed
-and closed.
+`LifecycleProcessor`가 `Lifecycle` 인터페이스의 확장임을 알 수 있습니다. 이는 컨텍스트가 새로고침되고 닫힐 때 반응하기 위한 두 가지 다른 메소드도 추가합니다.
 
 [TIP]
 ====
-Note that the regular `org.springframework.context.Lifecycle` interface is a plain
-contract for explicit start and stop notifications and does not imply auto-startup
-at context refresh time. For fine-grained control over auto-startup and for graceful
-stopping of a specific bean (including startup and stop phases), consider implementing
-the extended `org.springframework.context.SmartLifecycle` interface instead.
+일반적인 `org.springframework.context.Lifecycle` 인터페이스는 명시적인 시작 및 중지 알림을 위한 간단한 계약으로, 컨텍스트 새로고침 시 자동 시작을 암시하지 않습니다. 자동 시작에 대한 세밀한 제어와 특정 빈의 우아한 중지(시작 및 중지 단계 포함)를 원한다면, `org.springframework.context.SmartLifecycle` 인터페이스를 대신 구현하는 것을 고려해보세요.
 
-Also, please note that stop notifications are not guaranteed to come before destruction.
-On regular shutdown, all `Lifecycle` beans first receive a stop notification before
-the general destruction callbacks are being propagated. However, on hot refresh during
-a context's lifetime or on stopped refresh attempts, only destroy methods are called.
+또한, 중지 알림이 파괴 전에 올 것이라는 보장은 없다는 점에 유의해야 합니다. 정규 종료 시, 모든 `Lifecycle` 빈은 일반 파괴 콜백이 전파되기 전에 먼저 중지 알림을 받습니다. 그러나 컨텍스트의 수명 중에 발생하는 핫 리프레시나 중지된 리프레시 시도에서는 파괴 메소드만 호출됩니다.
 ====
 
-The order of startup and shutdown invocations can be important. If a "`depends-on`"
-relationship exists between any two objects, the dependent side starts after its
-dependency, and it stops before its dependency. However, at times, the direct
-dependencies are unknown. You may only know that objects of a certain type should start
-prior to objects of another type. In those cases, the `SmartLifecycle` interface defines
-another option, namely the `getPhase()` method as defined on its super-interface,
-`Phased`. The following listing shows the definition of the `Phased` interface:
+시작과 종료 호출의 순서는 중요할 수 있습니다. 두 객체 간에 "`depends-on`" 관계가 존재하는 경우, 의존하는 쪽은 의존성이 있는 쪽보다 나중에 시작하고, 의존성이 있는 쪽보다 먼저 중지됩니다. 그러나 때때로 직접적인 의존성은 알 수 없습니다. 특정 유형의 객체가 다른 유형의 객체보다 먼저 시작해야 한다는 것만 알 수 있습니다. 이러한 경우에 `SmartLifecycle` 인터페이스는 또 다른 옵션을 정의합니다. 즉, 상위 인터페이스인 `Phased`에 정의된 `getPhase()` 메소드입니다. 다음 목록은 `Phased` 인터페이스의 정의를 보여줍니다.:
 
 [source,java,indent=0,subs="verbatim,quotes"]
 ----
@@ -448,26 +376,9 @@ The following listing shows the definition of the `SmartLifecycle` interface:
 	}
 ----
 
-When starting, the objects with the lowest phase start first. When stopping, the
-reverse order is followed. Therefore, an object that implements `SmartLifecycle` and
-whose `getPhase()` method returns `Integer.MIN_VALUE` would be among the first to start
-and the last to stop. At the other end of the spectrum, a phase value of
-`Integer.MAX_VALUE` would indicate that the object should be started last and stopped
-first (likely because it depends on other processes to be running). When considering the
-phase value, it is also important to know that the default phase for any "`normal`"
-`Lifecycle` object that does not implement `SmartLifecycle` is `0`. Therefore, any
-negative phase value indicates that an object should start before those standard
-components (and stop after them). The reverse is true for any positive phase value.
+시작할 때, 가장 낮은 단계(phase)를 가진 객체가 먼저 시작됩니다. 중지할 때는 반대 순서로 진행됩니다. 따라서 `SmartLifecycle`을 구현하고 `getPhase()` 메소드가 `Integer.MIN_VALUE`를 반환하는 객체는 시작할 때 가장 먼저 시작하고 중지할 때 가장 마지막에 중지됩니다. 반대로, `Integer.MAX_VALUE` 단계 값은 해당 객체가 마지막에 시작되고 첫 번째로 중지되어야 함을 나타냅니다(아마도 다른 프로세스가 실행 중이어야 하기 때문일 것입니다). 단계 값을 고려할 때, `SmartLifecycle`을 구현하지 않는 "일반적인" `Lifecycle` 객체의 기본 단계가 `0`이라는 것도 중요합니다. 따라서 어떤 음수 단계 값은 객체가 표준 구성 요소보다 먼저 시작해야 함(그리고 그들 후에 중지)을 나타냅니다. 양수 단계 값에 대해서는 반대가 사실입니다.
 
-The stop method defined by `SmartLifecycle` accepts a callback. Any
-implementation must invoke that callback's `run()` method after that implementation's
-shutdown process is complete. That enables asynchronous shutdown where necessary, since
-the default implementation of the `LifecycleProcessor` interface,
-`DefaultLifecycleProcessor`, waits up to its timeout value for the group of objects
-within each phase to invoke that callback. The default per-phase timeout is 30 seconds.
-You can override the default lifecycle processor instance by defining a bean named
-`lifecycleProcessor` within the context. If you want only to modify the timeout,
-defining the following would suffice:
+`SmartLifecycle`에 의해 정의된 stop 메소드는 콜백을 받아들입니다. 모든 구현은 해당 구현의 종료 프로세스가 완료된 후에 그 콜백의 `run()` 메소드를 호출해야 합니다. 이를 통해 필요에 따라 비동기적인 종료가 가능해지며, `LifecycleProcessor` 인터페이스의 기본 구현인 `DefaultLifecycleProcessor`는 각 단계 내의 객체 그룹이 그 콜백을 호출할 때까지 최대 타임아웃 값까지 기다립니다. 기본 단계별 타임아웃은 30초입니다. 컨텍스트 내에 `lifecycleProcessor`라는 이름의 빈을 정의함으로써 기본 수명주기 프로세서 인스턴스를 재정의할 수 있습니다. 타임아웃을 수정하고 싶다면 다음과 같이 정의하면 충분합니다:
 
 [source,xml,indent=0,subs="verbatim,quotes"]
 ----
@@ -477,18 +388,7 @@ defining the following would suffice:
 	</bean>
 ----
 
-As mentioned earlier, the `LifecycleProcessor` interface defines callback methods for the
-refreshing and closing of the context as well. The latter drives the shutdown
-process as if `stop()` had been called explicitly, but it happens when the context is
-closing. The 'refresh' callback, on the other hand, enables another feature of
-`SmartLifecycle` beans. When the context is refreshed (after all objects have been
-instantiated and initialized), that callback is invoked. At that point, the
-default lifecycle processor checks the boolean value returned by each
-`SmartLifecycle` object's `isAutoStartup()` method. If `true`, that object is
-started at that point rather than waiting for an explicit invocation of the context's or
-its own `start()` method (unlike the context refresh, the context start does not happen
-automatically for a standard context implementation). The `phase` value and any
-"`depends-on`" relationships determine the startup order as described earlier.
+앞서 언급했듯이, `LifecycleProcessor` 인터페이스는 컨텍스트의 새로고침과 닫기에 대한 콜백 메소드도 정의합니다. 후자는 `stop()`이 명시적으로 호출되었던 것처럼 종료 프로세스를 구동하지만, 컨텍스트가 닫힐 때 발생합니다. 반면 'refresh' 콜백은 `SmartLifecycle` 빈의 또 다른 기능을 활성화합니다. 컨텍스트가 새로고침될 때(모든 객체가 인스턴스화되고 초기화된 후), 해당 콜백이 호출됩니다. 그 시점에서 기본 수명주기 프로세서는 각 `SmartLifecycle` 객체의 `isAutoStartup()` 메소드가 반환하는 부울 값이 `true`인지 확인합니다. `true`라면, 해당 객체는 컨텍스트의 또는 그 자체의 `start()` 메소드에 대한 명시적인 호출을 기다리지 않고 그 시점에 시작됩니다(컨텍스트 새로고침과 달리, 컨텍스트 시작은 표준 컨텍스트 구현에 대해 자동으로 발생하지 않습니다). `phase` 값과 어떤 "`depends-on`" 관계는 앞서 설명한대로 시작 순서를 결정합니다.
 
 
 
@@ -497,19 +397,12 @@ automatically for a standard context implementation). The `phase` value and any
 
 [NOTE]
 ====
-This section applies only to non-web applications. Spring's web-based
-`ApplicationContext` implementations already have code in place to gracefully shut down
-the Spring IoC container when the relevant web application is shut down.
+이 섹션은 웹이 아닌 애플리케이션에만 적용됩니다. Spring의 웹 기반 `ApplicationContext` 구현은 관련 웹 애플리케이션이 종료될 때 Spring IoC 컨테이너를 graceful shutdown을 위한 코드를 이미 포함하고 있습니다.
 ====
 
-If you use Spring's IoC container in a non-web application environment (for
-example, in a rich client desktop environment), register a shutdown hook with the
-JVM. Doing so ensures a graceful shutdown and calls the relevant destroy methods on your
-singleton beans so that all resources are released. You must still configure
-and implement these destroy callbacks correctly.
+웹이 아닌 애플리케이션 환경(예: 리치 클라이언트 데스크톱 환경)에서 Spring의 IoC 컨테이너를 사용하는 경우, JVM에 종료 후크(shutdown hook)를 등록하세요. 이렇게 하면 graceful shutdown가 보장되고 싱글톤 빈에 대한 관련 파괴 메소드가 호출되어 모든 리소스가 해제됩니다. 여전히 이러한 파괴 콜백을 올바르게 구성하고 구현해야 합니다.
 
-To register a shutdown hook, call the `registerShutdownHook()` method that is
-declared on the `ConfigurableApplicationContext` interface, as the following example shows:
+종료 후크를 등록하려면, 다음 예제에서 보여주는 것처럼 `ConfigurableApplicationContext` 인터페이스에 선언된 `registerShutdownHook()` 메소드를 호출하세요.:
 
 [tabs]
 ======
@@ -559,10 +452,7 @@ Kotlin::
 [[beans-factory-aware]]
 == `ApplicationContextAware` and `BeanNameAware`
 
-When an `ApplicationContext` creates an object instance that implements the
-`org.springframework.context.ApplicationContextAware` interface, the instance is provided
-with a reference to that `ApplicationContext`. The following listing shows the definition
-of the `ApplicationContextAware` interface:
+`ApplicationContext`가 `org.springframework.context.ApplicationContextAware` 인터페이스를 구현하는 객체 인스턴스를 생성할 때, 해당 인스턴스는 그 `ApplicationContext`에 대한 참조를 제공받습니다. 다음 목록은 `ApplicationContextAware` 인터페이스의 정의를 보여줍니다:
 
 [source,java,indent=0,subs="verbatim,quotes"]
 ----
@@ -572,32 +462,11 @@ of the `ApplicationContextAware` interface:
 	}
 ----
 
-Thus, beans can programmatically manipulate the `ApplicationContext` that created them,
-through the `ApplicationContext` interface or by casting the reference to a known
-subclass of this interface (such as `ConfigurableApplicationContext`, which exposes
-additional functionality). One use would be the programmatic retrieval of other beans.
-Sometimes this capability is useful. However, in general, you should avoid it, because
-it couples the code to Spring and does not follow the Inversion of Control style,
-where collaborators are provided to beans as properties. Other methods of the
-`ApplicationContext` provide access to file resources, publishing application events,
-and accessing a `MessageSource`. These additional features are described in
-xref:core/beans/context-introduction.adoc[Additional Capabilities of the `ApplicationContext`].
+따라서, 빈은 `ApplicationContext` 인터페이스를 통하거나 이 인터페이스의 알려진 하위 클래스(예: 추가 기능을 제공하는 `ConfigurableApplicationContext`)로 참조를 캐스팅하여 생성한 `ApplicationContext`를 프로그래밍 방식으로 조작할 수 있습니다. 한 가지 사용 예는 다른 빈의 프로그래밍 방식 검색입니다. 때때로 이 기능이 유용할 수 있습니다. 그러나 일반적으로 이를 피해야 합니다. 왜냐하면 이는 코드를 Spring에 결합시키고, 협력자가 속성으로 빈에 제공되는 제어의 역전(Inversion of Control) 스타일을 따르지 않기 때문입니다. `ApplicationContext`의 다른 메소드들은 파일 자원에 대한 접근, 애플리케이션 이벤트의 발행, `MessageSource`에의 접근을 제공합니다. 이 추가 기능들은 xref:core/beans/context-introduction.adoc[`ApplicationContext`의 추가 기능]에서 설명됩니다.
 
-Autowiring is another alternative to obtain a reference to the
-`ApplicationContext`. The _traditional_ `constructor` and `byType` autowiring modes
-(as described in xref:core/beans/dependencies/factory-autowire.adoc[Autowiring Collaborators]) can provide a dependency of type
-`ApplicationContext` for a constructor argument or a setter method parameter,
-respectively. For more flexibility, including the ability to autowire fields and
-multiple parameter methods, use the annotation-based autowiring features. If you do,
-the `ApplicationContext` is autowired into a field, constructor argument, or method
-parameter that expects the `ApplicationContext` type if the field, constructor, or
-method in question carries the `@Autowired` annotation. For more information, see
-xref:core/beans/annotation-config/autowired.adoc[Using `@Autowired`].
+`ApplicationContext`에 대한 참조를 얻는 또 다른 대안은 오토와이어링(Autowiring)입니다. _전통적인_ `constructor` 및 `byType` 오토와이어링 모드(설명된 xref:core/beans/dependencies/factory-autowire.adoc[오토와이어링 협력자]에서)는 각각 생성자 인자나 세터 메소드 파라미터에 대한 `ApplicationContext` 타입의 의존성을 제공할 수 있습니다. 필드와 다중 파라미터 메소드에 대한 오토와이어링 기능을 포함한 더 큰 유연성을 위해 어노테이션 기반의 오토와이어링 기능을 사용하세요. 그렇게 하면, `@Autowired` 어노테이션이 있는 필드, 생성자 또는 메소드에 `ApplicationContext`가 오토와이어링됩니다. 자세한 내용은 xref:core/beans/annotation-config/autowired.adoc[`@Autowired` 사용하기]를 참조하세요.
 
-When an `ApplicationContext` creates a class that implements the
-`org.springframework.beans.factory.BeanNameAware` interface, the class is provided with
-a reference to the name defined in its associated object definition. The following listing
-shows the definition of the BeanNameAware interface:
+`ApplicationContext`가 `org.springframework.beans.factory.BeanNameAware` 인터페이스를 구현하는 클래스를 생성할 때, 해당 클래스는 관련 객체 정의에 정의된 이름에 대한 참조를 제공받습니다. 다음 목록은 `BeanNameAware` 인터페이스의 정의를 보여줍니다:
 
 [source,java,indent=0,subs="verbatim,quotes"]
 ----
