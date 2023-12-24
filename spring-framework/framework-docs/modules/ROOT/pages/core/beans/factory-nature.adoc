@@ -466,7 +466,7 @@ Kotlin::
 
 `ApplicationContext`에 대한 참조를 얻는 또 다른 대안은 오토와이어링(Autowiring)입니다. _전통적인_ `constructor` 및 `byType` 오토와이어링 모드(설명된 xref:core/beans/dependencies/factory-autowire.adoc[오토와이어링 협력자]에서)는 각각 생성자 인자나 세터 메소드 파라미터에 대한 `ApplicationContext` 타입의 의존성을 제공할 수 있습니다. 필드와 다중 파라미터 메소드에 대한 오토와이어링 기능을 포함한 더 큰 유연성을 위해 어노테이션 기반의 오토와이어링 기능을 사용하세요. 그렇게 하면, `@Autowired` 어노테이션이 있는 필드, 생성자 또는 메소드에 `ApplicationContext`가 오토와이어링됩니다. 자세한 내용은 xref:core/beans/annotation-config/autowired.adoc[`@Autowired` 사용하기]를 참조하세요.
 
-`ApplicationContext`가 `org.springframework.beans.factory.BeanNameAware` 인터페이스를 구현하는 클래스를 생성할 때, 해당 클래스는 관련 객체 정의에 정의된 이름에 대한 참조를 제공받습니다. 다음 목록은 `BeanNameAware` 인터페이스의 정의를 보여줍니다:
+`ApplicationContext` 가 `org.springframework.beans.factory.BeanNameAware` 인터페이스를 구현하는 클래스를 생성할 때, 해당 클래스는 관련 객체 정의에 정의된 이름에 대한 참조를 제공받습니다. 다음 목록은 `BeanNameAware` 인터페이스의 정의를 보여줍니다:
 
 [source,java,indent=0,subs="verbatim,quotes"]
 ----
@@ -476,9 +476,7 @@ Kotlin::
 	}
 ----
 
-The callback is invoked after population of normal bean properties but before an
-initialization callback such as `InitializingBean.afterPropertiesSet()` or a custom
-init-method.
+콜백은 일반 빈 속성이 채워진 후, 그러나 `InitializingBean.afterPropertiesSet()` 와 같은 초기화 콜백이나 사용자 정의 init-메소드 전에 호출됩니다.
 
 
 
