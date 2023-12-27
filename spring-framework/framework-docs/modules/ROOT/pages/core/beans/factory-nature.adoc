@@ -452,7 +452,7 @@ Kotlin::
 [[beans-factory-aware]]
 == `ApplicationContextAware` and `BeanNameAware`
 
-`ApplicationContext`가 `org.springframework.context.ApplicationContextAware` 인터페이스를 구현하는 객체 인스턴스를 생성할 때, 해당 인스턴스는 그 `ApplicationContext`에 대한 참조를 제공받습니다. 다음 목록은 `ApplicationContextAware` 인터페이스의 정의를 보여줍니다:
+`ApplicationContext` 가 `org.springframework.context.ApplicationContextAware` 인터페이스를 구현하는 객체 인스턴스를 생성할 때, 해당 인스턴스는 그 `ApplicationContext` 에 대한 참조를 제공받습니다. 다음 목록은 `ApplicationContextAware` 인터페이스의 정의를 보여줍니다:
 
 [source,java,indent=0,subs="verbatim,quotes"]
 ----
