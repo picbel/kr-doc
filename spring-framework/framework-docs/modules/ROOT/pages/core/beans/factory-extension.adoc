@@ -1,11 +1,8 @@
 [[beans-factory-extension]]
 = Container Extension Points
 
-Typically, an application developer does not need to subclass `ApplicationContext`
-implementation classes. Instead, the Spring IoC container can be extended by plugging in
-implementations of special integration interfaces. The next few sections describe these
-integration interfaces.
-
+일반적으로, 애플리케이션 개발자는 `ApplicationContext` 구현 클래스를 서브클래싱할 필요가 없습니다. 
+대신, Spring IoC 컨테이너는 특수 통합 인터페이스의 구현을 플러그인함으로써 확장될 수 있습니다. 다음 몇 섹션에서는 이러한 통합 인터페이스들을 설명합니다.
 
 
 [[beans-factory-extension-bpp]]
